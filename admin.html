@@ -3,113 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Surgery Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Admin - MSG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #007bff; --success: #28a745; --error: #d63031; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #e0eafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .admin-card { background: white; padding: 30px; border-radius: 30px; width: 100%; max-width: 400px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
-        .header { text-align: center; margin-bottom: 25px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-size: 11px; font-weight: 800; color: #2d3436; text-transform: uppercase; margin-bottom: 8px; }
-        input { width: 100%; padding: 15px; border: 2px solid #dfe6e9; border-radius: 15px; font-size: 16px; box-sizing: border-box; outline: none; }
-        input:focus { border-color: var(--primary); }
-        button { width: 100%; padding: 15px; border: none; border-radius: 15px; font-weight: 800; cursor: pointer; transition: 0.3s; margin-top: 10px; text-transform: uppercase; color: white; }
-        .btn-blue { background: var(--primary); }
-        .btn-green { background: var(--success); }
-        #status-msg { text-align: center; margin-top: 20px; font-size: 13px; font-weight: 600; padding: 10px; border-radius: 10px; display: none; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #eef2f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 30px; width: 100%; max-width: 380px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; font-size: 11px; font-weight: 800; color: #636e72; margin-bottom: 8px; text-transform: uppercase; }
+        input { width: 100%; padding: 15px; border: 2px solid #edeff2; border-radius: 15px; font-size: 16px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input:focus { border-color: #007bff; background: #f8fbff; }
+        button { width: 100%; padding: 16px; border: none; border-radius: 15px; font-weight: 800; cursor: pointer; color: white; transition: 0.3s; margin-top: 10px; }
+        .btn-update { background: #007bff; }
+        .btn-target { background: #2d3436; }
+        #status { text-align: center; margin-top: 20px; font-size: 13px; font-weight: 600; min-height: 20px; }
     </style>
 </head>
 <body>
-
-    <div class="admin-card">
-        <div class="header">
-            <h2 style="margin:0">COMMAND CENTER</h2>
-            <p style="font-size:12px; color: #636e72">Mắt Sài Gòn - Quản lý số liệu</p>
+    <div class="card">
+        <h2 style="text-align:center; margin-top:0">MSG ADMIN</h2>
+        <div class="input-group">
+            <label>Mã bảo mật (PIN)</label>
+            <input type="password" id="pin" placeholder="Nhập PIN 1234">
         </div>
-
-        <div class="form-group">
-            <label>1. Xác thực (Mã PIN)</label>
-            <input type="password" id="pinCode" placeholder="Nhập PIN (Mặc định 1234)">
+        <hr style="opacity:0.1; margin:25px 0">
+        <div class="input-group">
+            <label>Thiết lập mục tiêu</label>
+            <input type="number" id="targetVal" placeholder="Ví dụ: 5000">
+            <button class="btn-target" onclick="send('target', 'targetVal')">Lưu mục tiêu</button>
         </div>
-
-        <hr style="opacity: 0.1; margin: 25px 0;">
-
-        <div class="form-group">
-            <label>2. Thiết lập mục tiêu (Target)</label>
-            <input type="number" id="targetInput" placeholder="Nhập tổng mục tiêu năm">
-            <button class="btn-blue" onclick="pushData('target', 'targetInput')">Cập nhật mục tiêu</button>
+        <div class="input-group">
+            <label>Số ca hiện tại</label>
+            <input type="number" id="totalVal" placeholder="Ví dụ: 120">
+            <button class="btn-update" onclick="send('total', 'totalVal')">Cập nhật số ca</button>
         </div>
-
-        <div class="form-group" style="margin-top: 25px;">
-            <label>3. Số ca hiện tại (Total)</label>
-            <input type="number" id="totalInput" placeholder="Nhập số ca đã đạt được">
-            <button class="btn-green" onclick="pushData('total', 'totalInput')">Cập nhật số liệu</button>
-        </div>
-
-        <div id="status-msg"></div>
+        <div id="status"></div>
     </div>
 
     <script>
-        // ==========================================
-        // CẤU HÌNH TẠI ĐÂY
-        // ==========================================
-        const DB_URL = "https://cdsh-a2c06-default-rtdb.asia-southeast1.firebasedatabase.app/.json"; 
-        const ADMIN_PIN = "1234"; 
-        // ==========================================
+        const DB_URL = "https://cdsh-a2c06-default-rtdb.asia-southeast1.firebasedatabase.app/.json"; // THAY LINK TẠI ĐÂY
+        
+        async function send(key, id) {
+            const val = document.getElementById(id).value;
+            const pin = document.getElementById("pin").value;
+            const status = document.getElementById("status");
 
-        async function pushData(key, inputId) {
-            const val = document.getElementById(inputId).value;
-            const pin = document.getElementById("pinCode").value;
-            const msg = document.getElementById("status-msg");
+            if(pin !== "1234") { status.style.color = "red"; status.innerText = "Sai mã PIN!"; return; }
+            if(!val) { status.style.color = "orange"; status.innerText = "Nhập số liệu!"; return; }
 
-            // Hiển thị trạng thái
-            msg.style.display = "block";
-            msg.style.background = "#f1f2f6";
-            msg.style.color = "#2d3436";
-            msg.innerText = "Đang xử lý...";
-
-            // Kiểm tra mã PIN
-            if (pin !== ADMIN_PIN) {
-                msg.style.background = "#ffeaa7";
-                msg.innerText = "❌ Sai mã PIN! Không thể gửi dữ liệu.";
-                return;
-            }
-
-            // Kiểm tra nhập liệu
-            if (!val) {
-                msg.style.background = "#ffeaa7";
-                msg.innerText = "⚠️ Vui lòng nhập con số cụ thể.";
-                return;
-            }
-
-            const data = {};
-            data[key] = Number(val);
+            status.style.color = "gray"; status.innerText = "Đang gửi...";
+            const data = {}; data[key] = Number(val);
 
             try {
-                const response = await fetch(DB_URL, {
+                const res = await fetch(DB_URL, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-
-                if (response.ok) {
-                    msg.style.background = "#d1f2eb";
-                    msg.style.color = "var(--success)";
-                    msg.innerText = "THÀNH CÔNG! Dữ liệu đã lên Firebase ✅";
-                    // Tự xóa số sau 2 giây để tránh nhầm lẫn
-                    setTimeout(() => { document.getElementById(inputId).value = ""; }, 2000);
-                } else {
-                    const errorData = await response.json();
-                    msg.style.background = "#fab1a0";
-                    msg.style.color = "var(--error)";
-                    msg.innerText = "LỖI FIREBASE: " + (errorData.error || "Permission Denied");
-                }
-            } catch (error) {
-                msg.style.background = "#fab1a0";
-                msg.style.color = "var(--error)";
-                msg.innerText = "LỖI KẾT NỐI: Kiểm tra lại Link Database!";
-                console.error(error);
+                if(res.ok) {
+                    status.style.color = "green"; status.innerText = "THÀNH CÔNG! ✅";
+                    document.getElementById(id).value = "";
+                } else { throw new Error(); }
+            } catch(e) {
+                status.style.color = "red"; status.innerText = "LỖI: Kiểm tra Rules hoặc Link!";
             }
         }
     </script>
