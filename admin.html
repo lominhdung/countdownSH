@@ -1,54 +1,156 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Surgery Tracker</title>
+    <title>Hệ thống Quản lý - Mắt Sài Gòn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; background: #01080e; color: white; display: flex; justify-content: center; padding: 20px; }
-        .card { background: #0a1622; padding: 25px; border-radius: 15px; width: 100%; max-width: 350px; border: 1px solid #00ff7f; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #1a2a3a; background: #01080e; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #00ff7f; color: #000; margin-top: 10px; }
-        label { font-size: 12px; color: #00ff7f; text-transform: uppercase; }
+        :root {
+            --primary: #007bff;
+            --success: #28a745;
+            --bg: #f4f7f9;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #e0eafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .admin-card {
+            background: white;
+            padding: 30px;
+            border-radius: 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h2 { margin: 0; color: #2d3436; font-size: 22px; }
+        .header p { font-size: 13px; color: #636e72; margin-top: 5px; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 12px; font-weight: 700; color: #2d3436; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #dfe6e9;
+            border-radius: 15px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: 0.3s;
+            outline: none;
+        }
+        input:focus { border-color: var(--primary); background: #f0f7ff; }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 10px 20px rgba(0,123,255,0.2); }
+        .btn-success { background: var(--success); color: white; box-shadow: 0 10px 20px rgba(40,167,69,0.2); }
+        button:active { transform: scale(0.98); }
+
+        #status-msg {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            min-height: 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h3>COMMAND_CENTER</h3>
-        <label>Mật mã bảo mật</label>
-        <input type="password" id="pin" placeholder="****">
-        <hr style="opacity: 0.1; margin: 20px 0;">
-        <label>Thiết lập mục tiêu</label>
-        <input type="number" id="targetVal" placeholder="Ví dụ: 5000">
-        <button onclick="updateData('target', 'targetVal')">CẬP NHẬT MỤC TIÊU</button>
-        <br><br>
-        <label>Số ca hiện tại</label>
-        <input type="number" id="totalVal" placeholder="Ví dụ: 1200">
-        <button onclick="updateData('total', 'totalVal')" style="background: #ffce67;">CẬP NHẬT SỐ LIỆU</button>
-        <p id="msg" style="text-align: center; font-size: 12px; margin-top: 15px;"></p>
+
+    <div class="admin-card">
+        <div class="header">
+            <h2>Hệ thống Điều khiển</h2>
+            <p>Cập nhật số liệu Real-time</p>
+        </div>
+
+        <div class="form-group">
+            <label>Mã bảo mật (PIN)</label>
+            <input type="password" id="pinCode" placeholder="Nhập mã PIN để thao tác">
+        </div>
+
+        <hr style="opacity: 0.1; margin: 30px 0;">
+
+        <div class="form-group">
+            <label>Mục tiêu năm (Target)</label>
+            <input type="number" id="targetInput" placeholder="VD: 5000">
+            <button class="btn-primary" onclick="pushData('target', 'targetInput')">Thiết lập mục tiêu</button>
+        </div>
+
+        <div class="form-group" style="margin-top: 30px;">
+            <label>Tổng ca phẫu thuật hiện tại</label>
+            <input type="number" id="totalInput" placeholder="VD: 1245">
+            <button class="btn-success" onclick="pushData('total', 'totalInput')">Cập nhật số liệu ngay</button>
+        </div>
+
+        <div id="status-msg"></div>
     </div>
 
     <script>
-        const FIREBASE_URL = "https://cdsh-a2c06-default-rtdb.asia-southeast1.firebasedatabase.app/.json";
-        const PIN_CODE = "1234"; // Thay đổi mã PIN ở đây
+        // --- THAY LINK FIREBASE CỦA BẠN VÀO ĐÂY ---
+        const DB_URL = "https://cdsh-a2c06-default-rtdb.asia-southeast1.firebasedatabase.app/.json";
+        const ADMIN_PIN = "1234"; 
 
-        async function updateData(key, inputId) {
+        async function pushData(dataKey, inputId) {
             const val = document.getElementById(inputId).value;
-            const pin = document.getElementById("pin").value;
-            const msg = document.getElementById("msg");
+            const pin = document.getElementById("pinCode").value;
+            const status = document.getElementById("status-msg");
 
-            if(pin !== PIN_CODE) return alert("Sai mã bảo mật!");
-            if(!val) return alert("Vui lòng nhập số!");
+            if(pin !== ADMIN_PIN) {
+                status.style.color = "#d63031";
+                status.innerText = "Sai mã PIN bảo mật!";
+                return;
+            }
 
-            msg.innerText = "Đang đồng bộ...";
-            const data = {}; data[key] = Number(val);
+            if(!val) {
+                status.style.color = "#d63031";
+                status.innerText = "Vui lòng nhập số!";
+                return;
+            }
+
+            status.style.color = "#636e72";
+            status.innerText = "Đang đồng bộ dữ liệu...";
+
+            const payload = {};
+            payload[dataKey] = Number(val);
 
             try {
-                await fetch(FIREBASE_URL, { method: 'PATCH', body: JSON.stringify(data) });
-                msg.innerText = "Đã cập nhật thành công! ✅";
-                setTimeout(() => msg.innerText = "", 2000);
-            } catch(e) {
-                msg.innerText = "Lỗi kết nối mạng! ❌";
+                const response = await fetch(DB_URL, {
+                    method: 'PATCH',
+                    body: JSON.stringify(payload)
+                });
+
+                if(response.ok) {
+                    status.style.color = var(--success);
+                    status.innerText = "Cập nhật thành công! ✅";
+                    document.getElementById(inputId).value = ""; // Xóa số sau khi nhập
+                    setTimeout(() => status.innerText = "", 3000);
+                }
+            } catch (e) {
+                status.style.color = "#d63031";
+                status.innerText = "Lỗi kết nối Firebase! ❌";
             }
         }
     </script>
