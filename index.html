@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MSG Surgery Monitor - Final Edition</title>
+    <title>MSG Surgery Monitor - Celebration Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Plus+Jakarta+Sans:wght@400;600;800&family=Montserrat:wght@900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -21,7 +21,7 @@
             height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden;
         }
 
-        /* Hiệu ứng quét dòng kỹ thuật số */
+        /* Scanline effect */
         body::before {
             content: " "; position: absolute; inset: 0;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
@@ -35,7 +35,7 @@
             position: relative; z-index: 5;
         }
 
-        /* Header & Logo Box */
+        /* Logo & Header */
         .header { 
             background: rgba(255, 255, 255, 0.03); 
             border-left: 5px solid var(--brand-green); 
@@ -45,192 +45,155 @@
             background: white; padding: 12px; border-radius: 15px;
             display: inline-block; margin-bottom: 15px; box-shadow: 0 0 25px rgba(0, 155, 77, 0.4);
         }
-        .logo { height: 55px; display: block; }
+        .logo { height: 50px; display: block; }
         
-        .status-bar { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; color: var(--brand-light); }
+        .status-bar { font-size: 10px; font-weight: 600; color: var(--brand-light); }
         .dot { width: 8px; height: 8px; background: var(--brand-light); border-radius: 50%; display: inline-block; margin-right: 8px; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.2; } }
 
         /* Main Display */
         .main-card {
             background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 30px; padding: 40px 20px; text-align: center; position: relative;
+            border-radius: 30px; padding: 40px 20px; text-align: center;
         }
-        .label { font-family: var(--font-mono); font-size: 11px; color: var(--brand-light); letter-spacing: 3px; margin-bottom: 25px; }
-        
         .big-number { 
-            font-size: 105px; font-weight: 800; color: white; line-height: 0.8;
-            font-family: var(--font-mono); letter-spacing: -5px; transition: all 0.5s;
+            font-size: 100px; font-weight: 800; color: white; line-height: 0.8;
+            font-family: var(--font-mono); letter-spacing: -5px;
         }
-        .glow-active { text-shadow: 0 0 30px var(--brand-light); color: var(--brand-light); }
 
-        /* Gauge */
-        .gauge { margin: 45px 0; }
-        .progress-track { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--brand-green), var(--brand-light)); width: 0%; transition: width 2s cubic-bezier(0.1, 0.5, 0.3, 1); box-shadow: 0 0 20px var(--brand-green); }
-        .ticks { display: flex; justify-content: space-between; margin-top: 12px; font-family: var(--font-mono); font-size: 10px; opacity: 0.4; }
+        .progress-track { height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden; margin-top: 40px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--brand-green), var(--brand-light)); width: 0%; transition: width 2s ease; }
 
-        .percent-val { font-size: 55px; font-weight: 800; font-family: var(--font-mono); color: white; margin-top: 15px; }
+        .percent-val { font-size: 55px; font-weight: 800; font-family: var(--font-mono); margin-top: 20px; }
 
-        /* Grid Stats */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: auto; }
-        .box { border: 1px solid rgba(255,255,255,0.08); padding: 18px; background: rgba(255,255,255,0.02); border-radius: 15px; }
-        .box-val { font-family: var(--font-mono); font-size: 22px; color: var(--gold); display: block; margin-top: 5px; }
-        .box-lbl { font-size: 9px; text-transform: uppercase; opacity: 0.5; font-weight: 700; letter-spacing: 1px; }
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; }
+        .box { border: 1px solid rgba(255,255,255,0.08); padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px; }
+        .box-val { font-family: var(--font-mono); font-size: 20px; color: var(--gold); display: block; }
+        .box-lbl { font-size: 9px; opacity: 0.5; text-transform: uppercase; }
 
-        /* Victory Overlay */
-        #victory-screen {
-            position: fixed; inset: 0; z-index: 999; display: none;
-            background: radial-gradient(circle, rgba(0,77,41,0.98) 0%, rgba(1,8,14,1) 100%);
-            flex-direction: column; justify-content: center; align-items: center; text-align: center;
-            animation: fadeIn 0.5s ease;
+        /* LỚP PHỦ CHÚC MỪNG (VICTORY OVERLAY) */
+        #celebration-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: radial-gradient(circle, rgba(0, 155, 77, 0.95) 0%, rgba(1, 8, 14, 1) 100%);
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; animation: fadeIn 0.8s ease;
         }
-        .cup { width: 140px; filter: drop-shadow(0 0 30px var(--gold)); animation: bounce 2s infinite; }
-        .v-text { font-family: 'Montserrat', sans-serif; font-size: 45px; color: var(--gold); margin: 20px 0; text-transform: uppercase; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .congrats-text {
+            font-family: 'Montserrat', sans-serif; font-size: 60px; font-weight: 900;
+            color: var(--gold); text-transform: uppercase; letter-spacing: 5px;
+            text-shadow: 0 0 30px rgba(255, 206, 103, 0.5); margin: 0;
+        }
+        .sub-congrats { font-size: 20px; color: white; margin-top: 20px; letter-spacing: 2px; }
+        .btn-close { margin-top: 50px; background: white; color: var(--brand-green); border: none; padding: 15px 30px; border-radius: 50px; font-weight: 800; cursor: pointer; }
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Footer Time */
-        .footer-time {
-            background: #000; padding: 22px; margin-top: 20px; border-radius: 15px;
-            display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05);
+        .time-display {
+            background: #000; padding: 20px; margin-top: 20px; border-radius: 15px;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .clock-val { font-family: var(--font-mono); font-size: 26px; color: white; }
     </style>
 </head>
 <body>
 
-<div id="victory-screen">
-    <img src="https://i.imgur.com/vH9vYm8.png" class="cup" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3112/3112946.png'">
-    <div class="v-text">Mục tiêu<br>đã hoàn thành</div>
-    <div style="letter-spacing: 3px; font-weight: 600; color: white; opacity: 0.8;">CHÚC MỪNG ĐỘI NGŨ MẮT SÀI GÒN</div>
-    <button onclick="this.parentElement.style.display='none'" style="margin-top: 40px; background: none; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 10px 20px; cursor: pointer; border-radius: 8px;">Đóng tạm thời</button>
+<div id="celebration-overlay">
+    <div class="congrats-text">CHÚC MỪNG</div>
+    <div class="sub-congrats">MỤC TIÊU ĐÃ HOÀN THÀNH XUẤT SẮC!</div>
+    <div style="font-size: 80px; margin-top: 20px;">🏆</div>
+    <button class="btn-close" onclick="stopCelebration()">QUAY LẠI THEO DÕI</button>
 </div>
 
 <div class="wrapper">
     <div class="header">
-        <div class="logo-box">
-            <img src="logo.png" class="logo" alt="Logo">
-        </div>
-        <div class="status-bar">
-            <span class="dot"></span>LIVE MONITORING / SYSTEM ACTIVE
-        </div>
+        <div class="logo-box"><img src="logo.png" class="logo"></div>
+        <div class="status-bar"><span class="dot"></span>LIVE SYSTEM / TARGET TRACKING</div>
     </div>
 
     <div class="main-card">
-        <div class="label">TOTAL SURGICAL PROCEDURES</div>
+        <div style="font-size: 11px; letter-spacing: 3px; color: var(--brand-light); margin-bottom: 20px;">TOTAL SURGERIES</div>
         <div class="big-number" id="totalCount">0000</div>
-        
-        <div class="gauge">
-            <div class="progress-track">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div class="ticks">
-                <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
-            </div>
-        </div>
-
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
         <div class="percent-val" id="percentText">0.0%</div>
     </div>
 
     <div class="stats-grid">
-        <div class="box">
-            <span class="box-lbl">Chỉ tiêu năm</span>
-            <span class="box-val" id="targetLabel">0</span>
-        </div>
-        <div class="box">
-            <span class="box-lbl">Còn lại</span>
-            <span class="box-val" id="remainLabel">0</span>
-        </div>
-        <div class="box">
-            <span class="box-lbl">Trạng thái</span>
-            <span class="box-val" id="statusLabel" style="font-size: 15px; color: var(--brand-light);">ACTIVE</span>
-        </div>
-        <div class="box">
-            <span class="box-lbl">Dự báo</span>
-            <span class="box-val" style="font-size: 15px;">ON TRACK</span>
-        </div>
+        <div class="box"><span class="box-lbl">Chỉ tiêu</span><span class="box-val" id="targetVal">0</span></div>
+        <div class="box"><span class="box-lbl">Còn lại</span><span class="box-val" id="remainVal">0</span></div>
     </div>
 
-    <div class="footer-time">
-        <div style="font-size: 9px; opacity: 0.4; text-transform: uppercase; font-weight: 700;">Time Remaining<br>to 2026_EOY</div>
-        <div class="clock-val" id="countdown">00:00:00:00</div>
+    <div class="time-display">
+        <div style="font-size: 9px; opacity: 0.4;">TIME REMAINING</div>
+        <div style="font-family: var(--font-mono); font-size: 24px;" id="countdown">00:00:00:00</div>
     </div>
 </div>
 
 <script>
-    // THAY LINK FIREBASE CỦA BẠN VÀO ĐÂY
     const DB_URL = "https://cdsh-a2c06-default-rtdb.asia-southeast1.firebasedatabase.app/.json";
-    let isCelebrated = false;
+    let celebrationActive = false;
+    let fireworkTimer = null;
 
-    async function fetchData() {
+    function startCelebration() {
+        if (celebrationActive) return;
+        celebrationActive = true;
+        document.getElementById("celebration-overlay").style.display = "flex";
+
+        // Hàm bắn pháo hoa liên tục
+        fireworkTimer = setInterval(() => {
+            confetti({
+                particleCount: 50,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#009b4d', '#ffce67', '#ffffff']
+            });
+        }, 1500); // Mỗi 1.5 giây bắn một đợt
+    }
+
+    function stopCelebration() {
+        celebrationActive = false;
+        clearInterval(fireworkTimer);
+        document.getElementById("celebration-overlay").style.display = "none";
+    }
+
+    async function sync() {
         try {
-            const response = await fetch(DB_URL);
-            const data = await response.json();
+            const res = await fetch(DB_URL);
+            const data = await res.json();
             if(!data) return;
 
             const total = data.total || 0;
-            const target = data.target || 5000;
+            const target = data.target || 1000;
             const p = (total / target) * 100;
 
-            // Cập nhật số liệu chính
             document.getElementById("totalCount").innerText = total.toString().padStart(4, '0');
             document.getElementById("progressFill").style.width = Math.min(p, 100) + "%";
             document.getElementById("percentText").innerText = Math.min(p, 100).toFixed(1) + "%";
-            
-            // Cập nhật Grid
-            document.getElementById("targetLabel").innerText = target.toLocaleString();
-            document.getElementById("remainLabel").innerText = Math.max(0, target - total).toLocaleString();
+            document.getElementById("targetVal").innerText = target.toLocaleString();
+            document.getElementById("remainVal").innerText = Math.max(0, target - total).toLocaleString();
 
-            // Hiệu ứng khi đạt Target
+            // Kích hoạt pháo hoa nếu đạt 100%
             if (p >= 100) {
-                document.getElementById("totalCount").classList.add("glow-active");
-                document.getElementById("statusLabel").innerText = "SUCCESS";
-                document.getElementById("statusLabel").style.color = "var(--gold)";
-                
-                if (!isCelebrated) {
-                    isCelebrated = true;
-                    document.getElementById("victory-screen").style.display = "flex";
-                    
-                    // Hiệu ứng pháo hoa kéo dài
-                    const duration = 15 * 1000;
-                    const animationEnd = Date.now() + duration;
-                    const colors = ['#009b4d', '#ffce67', '#ffffff'];
-
-                    (function frame() {
-                        confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
-                        confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
-                        if (Date.now() < animationEnd) requestAnimationFrame(frame);
-                    }());
-                }
+                startCelebration();
             } else {
-                isCelebrated = false;
-                document.getElementById("totalCount").classList.remove("glow-active");
-                document.getElementById("statusLabel").innerText = "ACTIVE";
-                document.getElementById("statusLabel").style.color = "var(--brand-light)";
+                stopCelebration();
             }
-        } catch (error) {
-            console.error("Lỗi đồng bộ:", error);
-        }
+        } catch(e) {}
     }
 
-    function updateCountdown() {
-        const endOfYear = new Date("2025-12-31T23:59:59").getTime();
-        const now = new Date().getTime();
-        const gap = endOfYear - now;
-
-        if (gap > 0) {
-            const d = Math.floor(gap / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
-            const h = Math.floor((gap % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
-            const m = Math.floor((gap % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-            const s = Math.floor((gap % (1000 * 60)) / 1000).toString().padStart(2, '0');
+    function timer() {
+        const diff = new Date("2025-12-31T23:59:59") - new Date();
+        if(diff > 0) {
+            const d = Math.floor(diff / 86400000).toString().padStart(2,'0');
+            const h = Math.floor((diff % 86400000) / 3600000).toString().padStart(2,'0');
+            const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2,'0');
+            const s = Math.floor((diff % 60000) / 1000).toString().padStart(2,'0');
             document.getElementById("countdown").innerText = `${d}:${h}:${m}:${s}`;
         }
     }
 
-    setInterval(fetchData, 2000); // Đồng bộ mỗi 2 giây
-    setInterval(updateCountdown, 1000); // Chạy đồng hồ mỗi giây
-    fetchData(); // Chạy lần đầu ngay lập tức
+    setInterval(sync, 2000);
+    setInterval(timer, 1000);
+    sync();
 </script>
 </body>
 </html>
