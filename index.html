@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Surgery Monitor</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --brand-green: #009b4d; 
+            --brand-light: #00ff7f;
+            --bg-dark: #010a12;
+            --gold: #ffce67;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #01080e;
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Scanline effect cho cảm giác màn hình kỹ thuật số */
+        body::before {
+            content: " ";
+            position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 10;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .wrapper {
+            width: 100vw; height: 177.78vw; 
+            max-height: 100vh; max-width: 56.25vh;
+            padding: 30px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .header { text-align: left; border-left: 4px solid var(--brand-green); padding-left: 15px; margin-bottom: 30px; }
+        .logo { height: 60px; filter: brightness(1.2); margin-bottom: 10px; }
+        .status-dot { width: 8px; height: 8px; background: var(--brand-light); border-radius: 50%; display: inline-block; margin-right: 8px; box-shadow: 0 0 10px var(--brand-light); animation: blink 1s infinite; }
+        
+        @keyframes blink { 50% { opacity: 0.3; } }
+
+        .main-display {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .data-label { font-family: var(--font-mono); font-size: 10px; color: var(--brand-light); letter-spacing: 2px; margin-bottom: 20px; }
+        
+        .big-number { 
+            font-size: 110px; 
+            font-weight: 800; 
+            color: white; 
+            line-height: 0.8;
+            font-family: var(--font-mono);
+            letter-spacing: -5px;
+        }
+
+        /* Thanh tiến trình phân đoạn khoa học */
+        .gauge-container { margin: 40px 0; position: relative; }
+        .progress-track { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; position: relative; }
+        .progress-fill { height: 100%; background: var(--brand-green); width: 0%; transition: width 1s cubic-bezier(0.17, 0.67, 0.83, 0.67); box-shadow: 0 0 15px var(--brand-green); }
+        .ticks { display: flex; justify-content: space-between; margin-top: 10px; font-family: var(--font-mono); font-size: 9px; opacity: 0.4; }
+
+        /* Lưới thông tin kỹ thuật */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: auto;
+        }
+        .tech-box {
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 15px;
+            background: rgba(255,255,255,0.01);
+        }
+        .tech-box .val { font-family: var(--font-mono); font-size: 20px; color: var(--gold); display: block; }
+        .tech-box .unit { font-size: 9px; text-transform: uppercase; opacity: 0.4; }
+
+        .time-display {
+            font-family: var(--font-mono);
+            background: #000;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .time-val { font-size: 24px; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="header">
+        <img src="logo.png" class="logo">
+        <div style="font-size: 10px; opacity: 0.6; letter-spacing: 1px;">
+            <span class="status-dot"></span>SYSTEM ACTIVE / 2025_SURGERY_TRACKER
+        </div>
+    </div>
+
+    <div class="main-display">
+        <div class="data-label">TOTAL SURGICAL PROCEDURES</div>
+        <div class="big-number" id="totalCount">0000</div>
+        <div style="font-size: 14px; margin-top: 10px; opacity: 0.5;">PROCEDURES COMPLETED</div>
+
+        <div class="gauge-container">
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="ticks">
+                <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+            </div>
+        </div>
+
+        <div style="font-size: 48px; font-weight: 800; font-family: var(--font-mono);" id="percent">0.0%</div>
+    </div>
+
+    <div class="tech-grid">
+        <div class="tech-box">
+            <span class="unit">Mục tiêu năm</span>
+            <span class="val" id="targetLabel">0</span>
+        </div>
+        <div class="tech-box">
+            <span class="unit">Còn lại</span>
+            <span class="val" id="remain">0</span>
+        </div>
+        <div class="tech-box">
+            <span class="unit">Trạng thái</span>
+            <span class="val" id="status" style="font-size: 14px; color: var(--brand-light);">STABLE</span>
+        </div>
+        <div class="tech-box">
+            <span class="unit">Dự báo</span>
+            <span class="val" id="forecast" style="font-size: 14px;">ON TRACK</span>
+        </div>
+    </div>
+
+    <div class="time-display">
+        <div style="font-size: 9px; opacity: 0.5; text-transform: uppercase;">Time Remaining<br>to 2026_EOY</div>
+        <div class="time-val" id="countdown">00:00:00:00</div>
+    </div>
+</div>
+
+<script>
+    const deadline = new Date("2025-12-31T23:59:59").getTime();
+    let fireworkInterval = null;
+
+    function startCelebration() {
+        if (fireworkInterval) return;
+        fireworkInterval = setInterval(() => {
+            confetti({ particleCount: 30, spread: 70, origin: { y: 0.7 }, colors: ['#009b4d', '#ffce67'] });
+        }, 2000);
+    }
+
+    function update() {
+        const target = Number(localStorage.getItem("target") || 1000);
+        const total = Number(localStorage.getItem("total") || 0);
+        const p = (total / target) * 100;
+
+        // Định dạng số có 4 chữ số (0045) cho cảm giác kỹ thuật
+        document.getElementById("totalCount").innerText = total.toString().padStart(4, '0');
+        document.getElementById("progressFill").style.width = Math.min(p, 100) + "%";
+        document.getElementById("percent").innerText = p.toFixed(1) + "%";
+        document.getElementById("targetLabel").innerText = target.toLocaleString();
+        document.getElementById("remain").innerText = Math.max(0, target - total).toLocaleString();
+
+        if (p >= 100) {
+            startCelebration();
+            document.getElementById("status").innerText = "COMPLETED";
+            document.getElementById("status").style.color = "var(--gold)";
+        }
+
+        // Countdown
+        const now = new Date().getTime();
+        const distance = deadline - now;
+        if (distance > 0) {
+            const d = Math.floor(distance / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+            const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+            const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+            const s = Math.floor((distance % (1000 * 60)) / 1000).toString().padStart(2, '0');
+            document.getElementById("countdown").innerText = `${d}:${h}:${m}:${s}`;
+        }
+    }
+
+    setInterval(update, 1000);
+    update();
+</script>
+</body>
+</html>

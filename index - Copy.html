@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refractive Vision Mission - Saigon Eye</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Plus+Jakarta+Sans:wght@400;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --laser-color: #00ff7f; /* Xanh lá đặc trưng bệnh viện */
+            --vision-gold: #ffce67;
+            --space-bg: #030712;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--space-bg);
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            /* Nền ngân hà lấp lánh */
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(0, 255, 127, 0.05) 0%, transparent 50%),
+                radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 100px 150px, #fff, rgba(0,0,0,0));
+            background-size: 100% 100%, 200px 200px, 300px 300px, 250px 250px;
+        }
+
+        .wrapper {
+            width: 100vw; height: 177.78vw; 
+            max-height: 100vh; max-width: 56.25vh;
+            padding: 25px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Khung chứa Logo phong cách công nghệ cao */
+        .header {
+            text-align: center;
+            border: 2px solid var(--laser-color);
+            border-radius: 20px;
+            padding: 15px;
+            background: rgba(0, 255, 127, 0.05);
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .logo { height: 55px; filter: drop-shadow(0 0 10px var(--laser-color)); }
+
+        .mission-panel {
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Con số chính */
+        .vision-count {
+            font-family: 'Bungee', cursive;
+            font-size: 75px;
+            color: white;
+            text-shadow: 0 0 20px var(--laser-color);
+            margin: 10px 0;
+        }
+
+        /* Khu vực mô phỏng Laser phẫu thuật */
+        .laser-track {
+            width: 100%;
+            height: 120px;
+            margin: 30px 0;
+            position: relative;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px dashed rgba(0, 255, 127, 0.3);
+        }
+        
+        /* Luồng tia Laser */
+        .laser-beam {
+            position: absolute;
+            left: 0; top: 50%;
+            height: 4px;
+            background: var(--laser-color);
+            box-shadow: 0 0 15px var(--laser-color), 0 0 30px var(--laser-color);
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        /* Biểu tượng "Mắt sáng" di chuyển */
+        .eye-scanner {
+            position: absolute;
+            left: 0%; top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            transition: left 1s ease;
+            z-index: 5;
+        }
+
+        .target-goal {
+            position: absolute;
+            right: 15px; top: 50%;
+            transform: translateY(-50%);
+            font-size: 45px;
+            filter: grayscale(1) opacity(0.3);
+        }
+        .target-goal.active { filter: grayscale(0) opacity(1); text-shadow: 0 0 20px var(--vision-gold); }
+
+        /* Chỉ số phụ */
+        .stats {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px; width: 100%; margin-top: auto;
+        }
+        .stat-box {
+            background: rgba(0,0,0,0.4);
+            padding: 15px; border-radius: 15px; text-align: center;
+            border-bottom: 3px solid var(--laser-color);
+        }
+        .stat-label { font-size: 9px; opacity: 0.6; letter-spacing: 1px; margin-bottom: 5px; }
+        .stat-num { font-family: 'Bungee'; font-size: 18px; color: var(--vision-gold); }
+
+        /* Countdown khoa học kiểu anime */
+        .time-box {
+            margin-top: 20px;
+            width: 100%;
+            background: #111;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            border-left: 5px solid #ff0055;
+        }
+        .time-text { font-family: 'Bungee'; font-size: 22px; color: #ff0055; letter-spacing: 1px; }
+
+        /* Thông báo hoàn thành rực rỡ */
+        #victory-alert {
+            position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 100; display: none; text-align: center; width: 100%;
+            animation: zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes zoomIn { from { transform: translate(-50%, -50%) scale(0); } to { transform: translate(-50%, -50%) scale(1); } }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="header">
+        <img src="logo.png" class="logo">
+        <div style="font-size: 10px; font-weight: 800; color: var(--laser-color); margin-top: 5px;">HỆ THỐNG GIẢM CẬN THỊ VŨ TRỤ</div>
+    </div>
+
+    <div class="mission-panel">
+        <div id="victory-alert">
+            <div style="font-family: 'Bungee'; font-size: 35px; color: var(--vision-gold); text-shadow: 0 0 15px #000;">MISSION CLEAR!</div>
+            <div style="background: var(--laser-color); color: #000; font-weight: 900; padding: 5px 15px; border-radius: 5px;">TẦM NHÌN SÁNG RÕ 10/10</div>
+        </div>
+
+        <div style="font-size: 11px; font-weight: 800; opacity: 0.7;">SỐ CA KHÚC XẠ ĐÃ THÀNH CÔNG</div>
+        <div class="vision-count" id="totalCount">0000</div>
+
+        <div class="laser-track">
+            <div class="target-goal" id="targetEye">👁️</div>
+            <div class="laser-beam" id="laserBeam"></div>
+            <div class="eye-scanner" id="scanner">⚡</div>
+        </div>
+
+        <div style="font-family: 'Bungee'; font-size: 40px; color: var(--laser-color);" id="percent">0%</div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-label">CHỈ TIÊU 2025</div>
+                <div class="stat-num" id="targetLabel">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">CÒN CẦN PHẪU THUẬT</div>
+                <div class="stat-num" id="remain">0</div>
+            </div>
+        </div>
+
+        <div class="time-box">
+            <div style="font-size: 9px; margin-bottom: 5px; opacity: 0.5;">THỜI GIAN ĐẾN KẾT THÚC CHIẾN DỊCH</div>
+            <div class="time-text" id="countdown">00D 00:00:00</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const deadline = new Date("2025-12-31T23:59:59").getTime();
+    let isClear = false;
+
+    function fireConfetti() {
+        confetti({ particleCount: 40, spread: 70, origin: { y: 0.8 }, colors: ['#00ff7f', '#ffce67', '#ffffff'] });
+    }
+
+    function update() {
+        const target = Number(localStorage.getItem("target") || 1000);
+        const total = Number(localStorage.getItem("total") || 0);
+        const p = Math.min((total / target) * 100, 100);
+
+        document.getElementById("totalCount").innerText = total.toString().padStart(4, '0');
+        document.getElementById("percent").innerText = p.toFixed(1) + "%";
+        document.getElementById("targetLabel").innerText = target;
+        document.getElementById("remain").innerText = Math.max(0, target - total);
+        
+        // Cập nhật tia Laser và biểu tượng quét
+        document.getElementById("laserBeam").style.width = p + "%";
+        document.getElementById("scanner").style.left = p + "%";
+        
+        if (p >= 100) {
+            document.getElementById("targetEye").classList.add("active");
+            document.getElementById("targetEye").innerText = "✨👁️✨";
+            document.getElementById("victory-alert").style.display = "block";
+            if (!isClear) {
+                setInterval(fireConfetti, 2000);
+                isClear = true;
+            }
+        } else {
+            document.getElementById("targetEye").classList.remove("active");
+            document.getElementById("targetEye").innerText = "👁️";
+            document.getElementById("victory-alert").style.display = "none";
+            isClear = false;
+        }
+
+        // Countdown
+        const now = new Date().getTime();
+        const distance = deadline - now;
+        const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2,'0');
+        const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2,'0');
+        const s = Math.floor((distance % (1000 * 60)) / 1000).toString().padStart(2,'0');
+        document.getElementById("countdown").innerText = `${d}D ${h}:${m}:${s}`;
+    }
+
+    setInterval(update, 1000);
+    update();
+</script>
+</body>
+</html>
