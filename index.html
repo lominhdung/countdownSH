@@ -3,101 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surgery Monitor - Premium Light</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Surgery Monitor - Light Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        :root {
-            --primary: #007bff;
-            --success: #28a745;
-            --accent: #ff9f1c;
-            --bg-light: #f4f7f9;
-        }
-
-        body {
-            margin: 0; font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-            color: #2d3436; height: 100vh;
-            display: flex; justify-content: center; align-items: center; overflow: hidden;
-        }
-
-        .wrapper {
-            width: 100vw; height: 177.78vw; max-height: 100vh; max-width: 56.25vh;
-            padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; position: relative;
-        }
-
-        /* Thành phần giao diện */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: rgba(255,255,255,0.8); padding: 10px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .logo { height: 50px; }
-        .main-card { background: rgba(255,255,255,0.9); border: 2px solid #fff; border-radius: 35px; padding: 40px 20px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.08); backdrop-filter: blur(10px); margin-bottom: 20px; }
-        .big-number { font-family: 'JetBrains Mono', monospace; font-size: 110px; font-weight: 800; color: #000; line-height: 1; margin: 15px 0; }
-        .progress-track { height: 16px; background: #dfe6e9; border-radius: 20px; overflow: hidden; margin: 30px 0; }
+        :root { --primary: #007bff; --success: #28a745; --accent: #ff9f1c; }
+        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #2d3436; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .wrapper { width: 100vw; height: 177.78vw; max-height: 100vh; max-width: 56.25vh; padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; position: relative; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 12px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .logo { height: 55px; }
+        
+        .main-card { background: rgba(255,255,255,0.9); border: 2px solid #fff; border-radius: 35px; padding: 45px 20px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.08); backdrop-filter: blur(10px); }
+        .big-number { font-family: 'JetBrains Mono', monospace; font-size: 110px; font-weight: 800; color: #000; line-height: 1; margin: 15px 0; letter-spacing: -2px; }
+        
+        .progress-track { height: 18px; background: #dfe6e9; border-radius: 20px; overflow: hidden; margin: 35px 0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
         .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #00c6ff, #0072ff); border-radius: 20px; transition: width 2s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .stat-box { background: #fff; padding: 20px; border-radius: 25px; border: 2px solid #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.03); text-align: center; }
-        .stat-box .val { font-family: 'JetBrains Mono'; font-size: 26px; color: var(--primary); display: block; }
-        .footer { margin-top: auto; padding: 20px; background: #2d3436; border-radius: 25px; display: flex; justify-content: space-between; align-items: center; color: #fff; }
+        
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
+        .stat-box { background: #fff; padding: 22px; border-radius: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.03); text-align: center; border: 1px solid #fff; }
+        .stat-box .val { font-family: 'JetBrains Mono'; font-size: 28px; color: var(--primary); display: block; margin-top: 5px; }
+        
+        .footer { margin-top: auto; padding: 20px; background: #2d3436; border-radius: 28px; display: flex; justify-content: space-between; align-items: center; color: #fff; }
 
         /* MÀN HÌNH CHÚC MỪNG PHỦ KÍN */
-        #victory-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffffff; /* Màu nền trắng đặc để che hết số liệu */
-            display: none; flex-direction: column; justify-content: center;
-            align-items: center; z-index: 9999; /* Đảm bảo nổi lên trên cùng */
-            text-align: center;
-        }
-        #victory-screen h1 { font-size: 45px; color: #000; margin: 20px 0; font-weight: 800; }
-        #victory-screen p { font-size: 20px; color: var(--primary); font-weight: 600; padding: 0 20px; }
-        .badge { font-size: 120px; animation: bounce 2s infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        #victory-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; text-align: center; }
+        #victory-screen h1 { font-size: 42px; color: #2d3436; margin: 25px 0; font-weight: 800; line-height: 1.2; }
     </style>
 </head>
 <body>
-
-<div id="victory-screen">
-    <div class="badge">🏆</div>
-    <h1>MISSION COMPLETED</h1>
-    <p>Mắt Sài Gòn chúc mừng đội ngũ y bác sĩ<br>đã xuất sắc hoàn thành mục tiêu năm!</p>
-    <div style="margin-top: 50px; font-size: 12px; color: #b2bec3; font-family: 'JetBrains Mono';">REAL-TIME SURGERY TRACKER v2.0</div>
-</div>
-
-<div class="wrapper">
-    <div class="header">
-        <img src="logo.png" class="logo">
-        <div style="font-size: 10px; font-weight: 800; color: var(--success);">● LIVE UPDATE</div>
+    <div id="victory-screen">
+        <div style="font-size: 130px; animation: bounce 2s infinite;">🏆</div>
+        <h1>MỤC TIÊU NĂM<br>HOÀN THÀNH!</h1>
+        <p style="font-size: 20px; color: var(--primary); font-weight: 600;">Chúc mừng đội ngũ Mắt Sài Gòn!</p>
     </div>
 
-    <div class="main-card">
-        <div style="font-size: 12px; font-weight: 700; color: #636e72; letter-spacing: 2px;">TỔNG CA PHẪU THUẬT</div>
-        <div class="big-number" id="totalCount">0000</div>
-        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-        <div style="font-size: 55px; font-weight: 800; font-family: 'JetBrains Mono'; color: var(--primary);" id="percent">0.0%</div>
+    <div class="wrapper">
+        <div class="header">
+            <img src="logo.png" class="logo">
+            <div style="font-size: 10px; font-weight: 800; color: var(--success);">● HỆ THỐNG TRỰC TUYẾN</div>
+        </div>
+        <div class="main-card">
+            <div style="font-size: 12px; font-weight: 700; color: #636e72; letter-spacing: 2px;">TỔNG CA PHẪU THUẬT</div>
+            <div class="big-number" id="totalCount">0000</div>
+            <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+            <div style="font-size: 58px; font-weight: 800; font-family: 'JetBrains Mono'; color: var(--primary);" id="percent">0.0%</div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-box"><span style="font-size: 10px; font-weight: 700; color: #b2bec3;">MỤC TIÊU</span><span class="val" id="targetLabel">0</span></div>
+            <div class="stat-box"><span style="font-size: 10px; font-weight: 700; color: #b2bec3;">CÒN LẠI</span><span class="val" id="remain" style="color: var(--accent);">0</span></div>
+        </div>
+        <div class="footer">
+            <div style="font-size: 10px; font-weight: 700;">THỜI GIAN<br>CÒN LẠI</div>
+            <div style="font-family: 'JetBrains Mono'; font-size: 26px; font-weight: 700; color: var(--accent);" id="countdown">00:00:00:00</div>
+        </div>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-box"><span style="font-size: 10px; font-weight: 700; color: #636e72;">MỤC TIÊU</span><span class="val" id="targetLabel">0</span></div>
-        <div class="stat-box"><span style="font-size: 10px; font-weight: 700; color: #636e72;">CÒN LẠI</span><span class="val" id="remain" style="color: var(--accent);">0</span></div>
-    </div>
+    <script>
+        const DB_URL = "https://cdsh-a2c06-default-rtdb.asia-southeast1.firebasedatabase.app/.json"; // THAY LINK TẠI ĐÂY
+        let isDone = false;
 
-    <div class="footer">
-        <div style="font-size: 10px; font-weight: 700;">THỜI GIAN<br>CÒN LẠI</div>
-        <div style="font-family: 'JetBrains Mono'; font-size: 26px; font-weight: 700; color: var(--accent);" id="countdown">00:00:00:00</div>
-    </div>
-</div>
-
-<script>
-    // --- THAY LINK FIREBASE CỦA BẠN VÀO ĐÂY ---
-    const DB_URL = "https://cdsh-a2c06-default-rtdb.asia-southeast1.firebasedatabase.app/.json";
-    
-    let isDone = false;
-    async function sync() {
-        try {
-            const res = await fetch(DB_URL);
-            const data = await res.json();
-            if(data) {
+        async function sync() {
+            try {
+                const res = await fetch(DB_URL);
+                const data = await res.json();
+                if(!data) return;
                 const total = data.total || 0;
                 const target = data.target || 1000;
-                const p = (total/target)*100;
+                const p = (total / target) * 100;
                 
                 document.getElementById("totalCount").innerText = total.toString().padStart(4, '0');
                 document.getElementById("targetLabel").innerText = target.toLocaleString();
@@ -108,34 +81,29 @@
                 if(p >= 100 && !isDone) {
                     isDone = true;
                     document.getElementById("victory-screen").style.display = "flex";
-                    
-                    // Hiệu ứng pháo hoa kéo dài
-                    var duration = 15 * 1000;
-                    var animationEnd = Date.now() + duration;
-                    var interval = setInterval(function() {
-                        var timeLeft = animationEnd - Date.now();
-                        if (timeLeft <= 0) return clearInterval(interval);
-                        confetti({ particleCount: 40, spread: 70, origin: { y: 0.6 } });
-                    }, 250);
+                    var end = Date.now() + (15 * 1000);
+                    (function frame() {
+                        confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 } });
+                        confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 } });
+                        if (Date.now() < end) requestAnimationFrame(frame);
+                    }());
                 } else if (p < 100) {
-                    // Nếu số liệu giảm xuống dưới 100% thì ẩn màn hình chúc mừng đi
                     document.getElementById("victory-screen").style.display = "none";
                     isDone = false;
                 }
-            }
-        } catch(e) {}
-    }
+            } catch(e) { console.error("Lỗi đồng bộ"); }
+        }
 
-    setInterval(() => {
+        setInterval(() => {
+            sync();
+            const dist = new Date("2025-12-31T23:59:59") - new Date();
+            const d = Math.floor(dist / 86400000).toString().padStart(2, '0');
+            const h = Math.floor((dist % 86400000) / 3600000).toString().padStart(2, '0');
+            const m = Math.floor((dist % 3600000) / 60000).toString().padStart(2, '0');
+            const s = Math.floor((dist % 60000) / 1000).toString().padStart(2, '0');
+            document.getElementById("countdown").innerText = `${d}:${h}:${m}:${s}`;
+        }, 2000);
         sync();
-        const dist = new Date("2025-12-31T23:59:59") - new Date();
-        const d = Math.floor(dist / 86400000).toString().padStart(2, '0');
-        const h = Math.floor((dist % 86400000) / 3600000).toString().padStart(2, '0');
-        const m = Math.floor((dist % 3600000) / 60000).toString().padStart(2, '0');
-        const s = Math.floor((dist % 60000) / 1000).toString().padStart(2, '0');
-        document.getElementById("countdown").innerText = `${d}:${h}:${m}:${s}`;
-    }, 2000);
-    sync();
-</script>
+    </script>
 </body>
 </html>
