@@ -1,71 +1,56 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Admin - Quản lý số liệu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Surgery Tracker</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; line-height: 1.6; background: #f4f4f4; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; max-width: 400px; }
-        h2 { margin-top: 0; color: #333; font-size: 18px; border-bottom: 2px solid #009b4d; padding-bottom: 5px; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; transition: 0.3s; }
-        .btn-save { background: #009b4d; color: white; margin-bottom: 10px; }
-        .btn-target { background: #007bff; color: white; }
-        .btn-reset { background: #dc3545; color: white; margin-top: 20px; }
-        button:hover { opacity: 0.8; }
+        body { font-family: sans-serif; background: #01080e; color: white; display: flex; justify-content: center; padding: 20px; }
+        .card { background: #0a1622; padding: 25px; border-radius: 15px; width: 100%; max-width: 350px; border: 1px solid #00ff7f; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #1a2a3a; background: #01080e; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #00ff7f; color: #000; margin-top: 10px; }
+        label { font-size: 12px; color: #00ff7f; text-transform: uppercase; }
     </style>
 </head>
 <body>
-
     <div class="card">
-        <h2>1. Thiết lập mục tiêu năm</h2>
-        <input id="targetInput" type="number" placeholder="Nhập mục tiêu tổng (VD: 1000)">
-        <button class="btn-target" onclick="saveTarget()">Cập nhật mục tiêu</button>
+        <h3>COMMAND_CENTER</h3>
+        <label>Mật mã bảo mật</label>
+        <input type="password" id="pin" placeholder="****">
+        <hr style="opacity: 0.1; margin: 20px 0;">
+        <label>Thiết lập mục tiêu</label>
+        <input type="number" id="targetVal" placeholder="Ví dụ: 5000">
+        <button onclick="updateData('target', 'targetVal')">CẬP NHẬT MỤC TIÊU</button>
+        <br><br>
+        <label>Số ca hiện tại</label>
+        <input type="number" id="totalVal" placeholder="Ví dụ: 1200">
+        <button onclick="updateData('total', 'totalVal')" style="background: #ffce67;">CẬP NHẬT SỐ LIỆU</button>
+        <p id="msg" style="text-align: center; font-size: 12px; margin-top: 15px;"></p>
     </div>
 
-    <div class="card">
-        <h2>2. Nhập số ca phẫu thuật hôm nay</h2>
-        <input id="money" type="number" placeholder="Nhập số ca vừa thực hiện">
-        <button class="btn-save" onclick="saveData()">Cộng thêm vào tổng</button>
-    </div>
+    <script>
+        const FIREBASE_URL = "https://cdsh-a2c06-default-rtdb.asia-southeast1.firebasedatabase.app/.json";
+        const PIN_CODE = "1234"; // Thay đổi mã PIN ở đây
 
-    <div class="card" style="background: #fff5f5;">
-        <h2>Vùng nguy hiểm</h2>
-        <button class="btn-reset" onclick="resetAll()">Xóa toàn bộ dữ liệu (Reset về 0)</button>
-    </div>
+        async function updateData(key, inputId) {
+            const val = document.getElementById(inputId).value;
+            const pin = document.getElementById("pin").value;
+            const msg = document.getElementById("msg");
 
-<script>
-    // Hiển thị giá trị hiện tại khi load trang
-    window.onload = function() {
-        document.getElementById('targetInput').value = localStorage.getItem("target") || 1000;
-    }
+            if(pin !== PIN_CODE) return alert("Sai mã bảo mật!");
+            if(!val) return alert("Vui lòng nhập số!");
 
-    function saveTarget() {
-        let newTarget = document.getElementById("targetInput").value;
-        if(newTarget > 0) {
-            localStorage.setItem("target", newTarget);
-            alert("Đã cập nhật mục tiêu mới: " + newTarget + " ca");
+            msg.innerText = "Đang đồng bộ...";
+            const data = {}; data[key] = Number(val);
+
+            try {
+                await fetch(FIREBASE_URL, { method: 'PATCH', body: JSON.stringify(data) });
+                msg.innerText = "Đã cập nhật thành công! ✅";
+                setTimeout(() => msg.innerText = "", 2000);
+            } catch(e) {
+                msg.innerText = "Lỗi kết nối mạng! ❌";
+            }
         }
-    }
-
-    function saveData() {
-        let today = Number(document.getElementById("money").value);
-        if(today === 0) return alert("Vui lòng nhập số ca");
-        
-        let total = Number(localStorage.getItem("total") || 0);
-        total += today;
-        localStorage.setItem("total", total);
-        
-        document.getElementById("money").value = ""; // Xóa ô nhập sau khi lưu
-        alert("Đã cộng thêm. Tổng hiện tại: " + total + " ca");
-    }
-
-    function resetAll() {
-        if(confirm("Bạn có chắc chắn muốn xóa toàn bộ số liệu và bắt đầu lại từ đầu?")) {
-            localStorage.setItem("total", 0);
-            alert("Dữ liệu đã về 0");
-        }
-    }
-</script>
+    </script>
 </body>
 </html>
