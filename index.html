@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MSG Surgery Monitor - Celebration Edition</title>
+    <title>MSG Surgery Monitor - Live Celebration</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Plus+Jakarta+Sans:wght@400;600;800&family=Montserrat:wght@900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -21,12 +21,12 @@
             height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden;
         }
 
-        /* Scanline effect */
+        /* Lớp phủ Scanline */
         body::before {
             content: " "; position: absolute; inset: 0;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
                         linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            z-index: 10; background-size: 100% 2px, 3px 100%; pointer-events: none;
+            z-index: 20; background-size: 100% 2px, 3px 100%; pointer-events: none;
         }
 
         .wrapper {
@@ -35,127 +35,143 @@
             position: relative; z-index: 5;
         }
 
-        /* Logo & Header */
+        /* LOGO & HEADER */
         .header { 
             background: rgba(255, 255, 255, 0.03); 
             border-left: 5px solid var(--brand-green); 
-            padding: 20px; border-radius: 0 20px 20px 0; margin-bottom: 30px; 
+            padding: 20px; border-radius: 0 20px 20px 0; margin-bottom: 25px;
+            position: relative; z-index: 30;
         }
-        .logo-box {
-            background: white; padding: 12px; border-radius: 15px;
-            display: inline-block; margin-bottom: 15px; box-shadow: 0 0 25px rgba(0, 155, 77, 0.4);
-        }
+        .logo-box { background: white; padding: 12px; border-radius: 12px; display: inline-block; margin-bottom: 10px; }
         .logo { height: 50px; display: block; }
-        
-        .status-bar { font-size: 10px; font-weight: 600; color: var(--brand-light); }
-        .dot { width: 8px; height: 8px; background: var(--brand-light); border-radius: 50%; display: inline-block; margin-right: 8px; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0.2; } }
+        .status-bar { font-size: 10px; color: var(--brand-light); letter-spacing: 1px; }
 
-        /* Main Display */
-        .main-card {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 30px; padding: 40px 20px; text-align: center;
-        }
-        .big-number { 
-            font-size: 100px; font-weight: 800; color: white; line-height: 0.8;
-            font-family: var(--font-mono); letter-spacing: -5px;
-        }
-
-        .progress-track { height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden; margin-top: 40px; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--brand-green), var(--brand-light)); width: 0%; transition: width 2s ease; }
-
-        .percent-val { font-size: 55px; font-weight: 800; font-family: var(--font-mono); margin-top: 20px; }
-
-        /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; }
-        .box { border: 1px solid rgba(255,255,255,0.08); padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px; }
-        .box-val { font-family: var(--font-mono); font-size: 20px; color: var(--gold); display: block; }
-        .box-lbl { font-size: 9px; opacity: 0.5; text-transform: uppercase; }
-
-        /* LỚP PHỦ CHÚC MỪNG (VICTORY OVERLAY) */
-        #celebration-overlay {
-            position: fixed; inset: 0; z-index: 9999;
-            background: radial-gradient(circle, rgba(0, 155, 77, 0.95) 0%, rgba(1, 8, 14, 1) 100%);
-            display: none; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; animation: fadeIn 0.8s ease;
+        /* KHỐI CHÚC MỪNG (ẨN/HIỆN) */
+        #congrats-banner {
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: pulse 1s infinite alternate;
         }
         .congrats-text {
-            font-family: 'Montserrat', sans-serif; font-size: 60px; font-weight: 900;
-            color: var(--gold); text-transform: uppercase; letter-spacing: 5px;
-            text-shadow: 0 0 30px rgba(255, 206, 103, 0.5); margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 45px;
+            font-weight: 900;
+            color: var(--gold);
+            text-shadow: 0 0 20px var(--gold);
+            margin: 0;
+            letter-spacing: 2px;
         }
-        .sub-congrats { font-size: 20px; color: white; margin-top: 20px; letter-spacing: 2px; }
-        .btn-close { margin-top: 50px; background: white; color: var(--brand-green); border: none; padding: 15px 30px; border-radius: 50px; font-weight: 800; cursor: pointer; }
+        @keyframes pulse {
+            from { transform: scale(1); opacity: 0.8; }
+            to { transform: scale(1.05); opacity: 1; }
+        }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* DATA DISPLAY */
+        .main-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px; padding: 40px 20px; text-align: center;
+            position: relative; z-index: 30;
+            backdrop-filter: blur(5px);
+        }
+        .big-number { 
+            font-size: 105px; font-weight: 800; font-family: var(--font-mono);
+            line-height: 0.8; letter-spacing: -5px; transition: 0.5s;
+        }
+        .glow-target { color: var(--brand-light) !important; text-shadow: 0 0 30px var(--brand-light); }
 
-        .time-display {
+        .progress-track { height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; margin-top: 35px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--brand-green), var(--brand-light)); width: 0%; transition: width 2s ease; }
+        
+        .percent-text { font-size: 55px; font-weight: 800; font-family: var(--font-mono); margin-top: 15px; }
+
+        /* GRID INFO */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; position: relative; z-index: 30; }
+        .box { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255,255,255,0.08); padding: 15px; border-radius: 15px; }
+        .box-val { font-family: var(--font-mono); font-size: 20px; color: var(--gold); display: block; }
+        .box-lbl { font-size: 9px; opacity: 0.5; text-transform: uppercase; font-weight: 700; }
+
+        /* FOOTER CLOCK */
+        .footer {
             background: #000; padding: 20px; margin-top: 20px; border-radius: 15px;
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex; justify-content: space-between; align-items: center; z-index: 30;
         }
     </style>
 </head>
 <body>
 
-<div id="celebration-overlay">
-    <div class="congrats-text">CHÚC MỪNG</div>
-    <div class="sub-congrats">MỤC TIÊU ĐÃ HOÀN THÀNH XUẤT SẮC!</div>
-    <div style="font-size: 80px; margin-top: 20px;">🏆</div>
-    <button class="btn-close" onclick="stopCelebration()">QUAY LẠI THEO DÕI</button>
-</div>
-
 <div class="wrapper">
     <div class="header">
         <div class="logo-box"><img src="logo.png" class="logo"></div>
-        <div class="status-bar"><span class="dot"></span>LIVE SYSTEM / TARGET TRACKING</div>
+        <div class="status-bar">LIVE MONITORING / TARGET PROGRESS</div>
+    </div>
+
+    <div id="congrats-banner">
+        <p class="congrats-text">CHÚC MỪNG</p>
+        <div style="font-size: 12px; color: white; letter-spacing: 2px; font-weight: 700;">MỤC TIÊU ĐÃ HOÀN THÀNH</div>
     </div>
 
     <div class="main-card">
-        <div style="font-size: 11px; letter-spacing: 3px; color: var(--brand-light); margin-bottom: 20px;">TOTAL SURGERIES</div>
+        <div style="font-size: 11px; color: var(--brand-light); letter-spacing: 2px; margin-bottom: 15px;">TOTAL SURGERIES</div>
         <div class="big-number" id="totalCount">0000</div>
         <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-        <div class="percent-val" id="percentText">0.0%</div>
+        <div class="percent-text" id="percentDisplay">0.0%</div>
     </div>
 
     <div class="stats-grid">
-        <div class="box"><span class="box-lbl">Chỉ tiêu</span><span class="box-val" id="targetVal">0</span></div>
+        <div class="box"><span class="box-lbl">Mục tiêu</span><span class="box-val" id="targetVal">0</span></div>
         <div class="box"><span class="box-lbl">Còn lại</span><span class="box-val" id="remainVal">0</span></div>
     </div>
 
-    <div class="time-display">
-        <div style="font-size: 9px; opacity: 0.4;">TIME REMAINING</div>
+    <div class="footer">
+        <div style="font-size: 8px; opacity: 0.5;">TIME UNTIL<br>EOY 2025</div>
         <div style="font-family: var(--font-mono); font-size: 24px;" id="countdown">00:00:00:00</div>
     </div>
 </div>
 
 <script>
     const DB_URL = "https://cdsh-a2c06-default-rtdb.asia-southeast1.firebasedatabase.app/.json";
-    let celebrationActive = false;
-    let fireworkTimer = null;
+    let isCelebrating = false;
+    let fireworks;
 
     function startCelebration() {
-        if (celebrationActive) return;
-        celebrationActive = true;
-        document.getElementById("celebration-overlay").style.display = "flex";
+        if (isCelebrating) return;
+        isCelebrating = true;
+        
+        // Hiện banner
+        document.getElementById("congrats-banner").style.display = "block";
+        document.getElementById("totalCount").classList.add("glow-target");
 
-        // Hàm bắn pháo hoa liên tục
-        fireworkTimer = setInterval(() => {
+        // Bắn pháo hoa liên tục từ 2 bên
+        fireworks = setInterval(() => {
+            // Bên trái
             confetti({
-                particleCount: 50,
-                spread: 70,
-                origin: { y: 0.6 },
+                particleCount: 40,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0, y: 0.8 },
                 colors: ['#009b4d', '#ffce67', '#ffffff']
             });
-        }, 1500); // Mỗi 1.5 giây bắn một đợt
+            // Bên phải
+            confetti({
+                particleCount: 40,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1, y: 0.8 },
+                colors: ['#009b4d', '#ffce67', '#ffffff']
+            });
+        }, 1200);
     }
 
     function stopCelebration() {
-        celebrationActive = false;
-        clearInterval(fireworkTimer);
-        document.getElementById("celebration-overlay").style.display = "none";
+        isCelebrating = false;
+        clearInterval(fireworks);
+        document.getElementById("congrats-banner").style.display = "none";
+        document.getElementById("totalCount").classList.remove("glow-target");
     }
 
-    async function sync() {
+    async function updateData() {
         try {
             const res = await fetch(DB_URL);
             const data = await res.json();
@@ -167,11 +183,10 @@
 
             document.getElementById("totalCount").innerText = total.toString().padStart(4, '0');
             document.getElementById("progressFill").style.width = Math.min(p, 100) + "%";
-            document.getElementById("percentText").innerText = Math.min(p, 100).toFixed(1) + "%";
+            document.getElementById("percentDisplay").innerText = Math.min(p, 100).toFixed(1) + "%";
             document.getElementById("targetVal").innerText = target.toLocaleString();
             document.getElementById("remainVal").innerText = Math.max(0, target - total).toLocaleString();
 
-            // Kích hoạt pháo hoa nếu đạt 100%
             if (p >= 100) {
                 startCelebration();
             } else {
@@ -180,7 +195,7 @@
         } catch(e) {}
     }
 
-    function timer() {
+    function runClock() {
         const diff = new Date("2025-12-31T23:59:59") - new Date();
         if(diff > 0) {
             const d = Math.floor(diff / 86400000).toString().padStart(2,'0');
@@ -191,9 +206,9 @@
         }
     }
 
-    setInterval(sync, 2000);
-    setInterval(timer, 1000);
-    sync();
+    setInterval(updateData, 2000);
+    setInterval(runClock, 1000);
+    updateData();
 </script>
 </body>
 </html>
