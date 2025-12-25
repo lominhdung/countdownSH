@@ -27,7 +27,7 @@
             overflow: hidden;
         }
 
-        /* Scanline effect cho cảm giác màn hình kỹ thuật số */
+        /* Scanline effect */
         body::before {
             content: " ";
             position: absolute; top: 0; left: 0; bottom: 0; right: 0;
@@ -72,13 +72,11 @@
             letter-spacing: -5px;
         }
 
-        /* Thanh tiến trình phân đoạn khoa học */
         .gauge-container { margin: 40px 0; position: relative; }
         .progress-track { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; position: relative; }
-        .progress-fill { height: 100%; background: var(--brand-green); width: 0%; transition: width 1s cubic-bezier(0.17, 0.67, 0.83, 0.67); box-shadow: 0 0 15px var(--brand-green); }
+        .progress-fill { height: 100%; background: var(--brand-green); width: 0%; transition: width 1.5s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 0 15px var(--brand-green); }
         .ticks { display: flex; justify-content: space-between; margin-top: 10px; font-family: var(--font-mono); font-size: 9px; opacity: 0.4; }
 
-        /* Lưới thông tin kỹ thuật */
         .tech-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -112,7 +110,7 @@
     <div class="header">
         <img src="logo.png" class="logo">
         <div style="font-size: 10px; opacity: 0.6; letter-spacing: 1px;">
-            <span class="status-dot"></span>SYSTEM ACTIVE / 2025_SURGERY_TRACKER
+            <span class="status-dot"></span>SYSTEM_ONLINE / REALTIME_TRACKER_V1
         </div>
     </div>
 
@@ -144,7 +142,7 @@
         </div>
         <div class="tech-box">
             <span class="unit">Trạng thái</span>
-            <span class="val" id="status" style="font-size: 14px; color: var(--brand-light);">STABLE</span>
+            <span class="val" id="status_text" style="font-size: 14px; color: var(--brand-light);">STABLE</span>
         </div>
         <div class="tech-box">
             <span class="unit">Dự báo</span>
@@ -153,41 +151,52 @@
     </div>
 
     <div class="time-display">
-        <div style="font-size: 9px; opacity: 0.5; text-transform: uppercase;">Time Remaining<br>to 2026_EOY</div>
+        <div style="font-size: 9px; opacity: 0.5; text-transform: uppercase;">Time Remaining<br>to 2025_EOY</div>
         <div class="time-val" id="countdown">00:00:00:00</div>
     </div>
 </div>
 
 <script>
+    // --- THAY LINK FIREBASE CỦA BẠN VÀO ĐÂY ---
+    const FIREBASE_URL = "https://TEN-DU-AN-CUA-BAN-default-rtdb.firebaseio.com/.json";
+    
     const deadline = new Date("2025-12-31T23:59:59").getTime();
-    let fireworkInterval = null;
+    let isCompleted = false;
 
-    function startCelebration() {
-        if (fireworkInterval) return;
-        fireworkInterval = setInterval(() => {
-            confetti({ particleCount: 30, spread: 70, origin: { y: 0.7 }, colors: ['#009b4d', '#ffce67'] });
-        }, 2000);
+    async function fetchData() {
+        try {
+            const response = await fetch(FIREBASE_URL);
+            const data = await response.json();
+            if (data) {
+                render(data.total || 0, data.target || 1000);
+            }
+        } catch (e) {
+            console.error("Lỗi đồng bộ dữ liệu");
+        }
     }
 
-    function update() {
-        const target = Number(localStorage.getItem("target") || 1000);
-        const total = Number(localStorage.getItem("total") || 0);
+    function render(total, target) {
         const p = (total / target) * 100;
-
-        // Định dạng số có 4 chữ số (0045) cho cảm giác kỹ thuật
+        
         document.getElementById("totalCount").innerText = total.toString().padStart(4, '0');
         document.getElementById("progressFill").style.width = Math.min(p, 100) + "%";
         document.getElementById("percent").innerText = p.toFixed(1) + "%";
         document.getElementById("targetLabel").innerText = target.toLocaleString();
         document.getElementById("remain").innerText = Math.max(0, target - total).toLocaleString();
 
-        if (p >= 100) {
-            startCelebration();
-            document.getElementById("status").innerText = "COMPLETED";
-            document.getElementById("status").style.color = "var(--gold)";
+        if (p >= 100 && !isCompleted) {
+            isCompleted = true;
+            document.getElementById("status_text").innerText = "COMPLETED";
+            document.getElementById("status_text").style.color = "var(--gold)";
+            setInterval(() => {
+                confetti({ particleCount: 30, spread: 70, origin: { y: 0.7 }, colors: ['#009b4d', '#ffce67'] });
+            }, 2000);
         }
+    }
 
-        // Countdown
+    // Cập nhật Countdown và Fetch dữ liệu mỗi 2 giây
+    setInterval(() => {
+        fetchData();
         const now = new Date().getTime();
         const distance = deadline - now;
         if (distance > 0) {
@@ -197,10 +206,9 @@
             const s = Math.floor((distance % (1000 * 60)) / 1000).toString().padStart(2, '0');
             document.getElementById("countdown").innerText = `${d}:${h}:${m}:${s}`;
         }
-    }
+    }, 2000);
 
-    setInterval(update, 1000);
-    update();
+    fetchData(); // Chạy lần đầu
 </script>
 </body>
 </html>
