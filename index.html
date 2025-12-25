@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Surgery Monitor</title>
+    <title>Advanced Surgery Monitor - Saigon Eye Hospital</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -27,13 +27,14 @@
             overflow: hidden;
         }
 
-        /* Scanline effect */
+        /* Hiệu ứng Scanline kỹ thuật số */
         body::before {
             content: " ";
             position: absolute; top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
             z-index: 10;
-            background-size: 100% 2px, 3px 100%;
+            background-size: 100% 3px, 3px 100%;
             pointer-events: none;
         }
 
@@ -45,79 +46,84 @@
             display: flex;
             flex-direction: column;
             border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
         }
 
+        /* Header */
         .header { text-align: left; border-left: 4px solid var(--brand-green); padding-left: 15px; margin-bottom: 30px; }
-        .logo { height: 60px; filter: brightness(1.2); margin-bottom: 10px; }
+        .logo { height: 60px; filter: brightness(1.2) drop-shadow(0 0 10px var(--brand-green)); margin-bottom: 10px; }
         .status-dot { width: 8px; height: 8px; background: var(--brand-light); border-radius: 50%; display: inline-block; margin-right: 8px; box-shadow: 0 0 10px var(--brand-light); animation: blink 1s infinite; }
-        
         @keyframes blink { 50% { opacity: 0.3; } }
 
+        /* Màn hình chính */
         .main-display {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 20px;
             padding: 30px 20px;
             text-align: center;
+            backdrop-filter: blur(10px);
         }
 
         .data-label { font-family: var(--font-mono); font-size: 10px; color: var(--brand-light); letter-spacing: 2px; margin-bottom: 20px; }
-        
         .big-number { 
-            font-size: 110px; 
-            font-weight: 800; 
-            color: white; 
-            line-height: 0.8;
-            font-family: var(--font-mono);
-            letter-spacing: -5px;
+            font-size: 110px; font-weight: 800; color: white; line-height: 0.8;
+            font-family: var(--font-mono); letter-spacing: -5px;
+            text-shadow: 0 0 30px rgba(0, 255, 127, 0.3);
         }
 
+        /* Thanh tiến trình */
         .gauge-container { margin: 40px 0; position: relative; }
-        .progress-track { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; position: relative; }
-        .progress-fill { height: 100%; background: var(--brand-green); width: 0%; transition: width 1.5s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 0 15px var(--brand-green); }
+        .progress-track { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--brand-green), var(--brand-light)); width: 0%; transition: width 2s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 0 20px var(--brand-green); }
         .ticks { display: flex; justify-content: space-between; margin-top: 10px; font-family: var(--font-mono); font-size: 9px; opacity: 0.4; }
 
-        .tech-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: auto;
-        }
-        .tech-box {
-            border: 1px solid rgba(255,255,255,0.05);
-            padding: 15px;
-            background: rgba(255,255,255,0.01);
-        }
-        .tech-box .val { font-family: var(--font-mono); font-size: 20px; color: var(--gold); display: block; }
-        .tech-box .unit { font-size: 9px; text-transform: uppercase; opacity: 0.4; }
+        /* Grid thông số */
+        .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: auto; }
+        .tech-box { border: 1px solid rgba(255,255,255,0.05); padding: 15px; background: rgba(255,255,255,0.01); border-radius: 8px; }
+        .tech-box .val { font-family: var(--font-mono); font-size: 22px; color: var(--gold); display: block; margin-top: 5px; }
+        .tech-box .unit { font-size: 9px; text-transform: uppercase; opacity: 0.4; letter-spacing: 1px; }
 
-        .time-display {
-            font-family: var(--font-mono);
-            background: #000;
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* Footer & Countdown */
+        .time-display { font-family: var(--font-mono); background: rgba(0,0,0,0.5); padding: 20px; margin-top: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(0, 255, 127, 0.1); }
+        .time-val { font-size: 26px; color: white; letter-spacing: 1px; }
+
+        /* Lớp phủ chúc mừng */
+        #congrats-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(1, 8, 14, 0.98);
+            display: none; flex-direction: column; justify-content: center;
+            align-items: center; z-index: 100; text-align: center;
+            animation: fadeIn 1.5s ease-in;
         }
-        .time-val { font-size: 24px; color: white; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .congrats-content h1 { font-family: var(--font-mono); color: var(--gold); font-size: 42px; margin: 0; text-shadow: 0 0 30px var(--gold); }
+        .congrats-content p { font-size: 18px; color: var(--brand-light); margin-top: 15px; letter-spacing: 1px; line-height: 1.6; }
     </style>
 </head>
 <body>
 
+<div id="congrats-overlay">
+    <div class="congrats-content">
+        <div style="font-size: 80px; margin-bottom: 20px;">🏆</div>
+        <h1>MISSION COMPLETED</h1>
+        <p>Mắt Sài Gòn chúc mừng đội ngũ<br>đã xuất sắc vượt mục tiêu 2025!</p>
+        <div style="font-family: var(--font-mono); font-size: 10px; opacity: 0.3; margin-top: 60px;">DỮ LIỆU ĐANG TIẾP TỤC ĐƯỢC CẬP NHẬT REALTIME...</div>
+    </div>
+</div>
+
 <div class="wrapper">
     <div class="header">
-        <img src="logo.png" class="logo">
+        <img src="logo.png" class="logo" alt="Logo">
         <div style="font-size: 10px; opacity: 0.6; letter-spacing: 1px;">
-            <span class="status-dot"></span>SYSTEM_ONLINE / REALTIME_TRACKER_V1
+            <span class="status-dot"></span>LIVE_SYSTEM: ACTIVE / TRACKING_ID: 2025_MSG
         </div>
     </div>
 
     <div class="main-display">
         <div class="data-label">TOTAL SURGICAL PROCEDURES</div>
         <div class="big-number" id="totalCount">0000</div>
-        <div style="font-size: 14px; margin-top: 10px; opacity: 0.5;">PROCEDURES COMPLETED</div>
+        <div style="font-size: 14px; margin-top: 10px; opacity: 0.5; font-family: var(--font-mono);">PHẪU THUẬT THÀNH CÔNG</div>
 
         <div class="gauge-container">
             <div class="progress-track">
@@ -128,7 +134,7 @@
             </div>
         </div>
 
-        <div style="font-size: 48px; font-weight: 800; font-family: var(--font-mono);" id="percent">0.0%</div>
+        <div style="font-size: 52px; font-weight: 800; font-family: var(--font-mono); color: var(--brand-light);" id="percent">0.0%</div>
     </div>
 
     <div class="tech-grid">
@@ -157,12 +163,13 @@
 </div>
 
 <script>
-    // --- THAY LINK FIREBASE CỦA BẠN VÀO ĐÂY ---
-    const FIREBASE_URL = "https://cdsh-a2c06-default-rtdb.asia-southeast1.firebasedatabase.app/.json";
+    // --- QUAN TRỌNG: THAY LINK FIREBASE CỦA BẠN VÀO ĐÂY ---
+    const FIREBASE_URL = "https://TEN-DU-AN-CUA-BAN-default-rtdb.firebaseio.com/.json";
     
     const deadline = new Date("2025-12-31T23:59:59").getTime();
     let isCompleted = false;
 
+    // Hàm lấy dữ liệu từ Firebase
     async function fetchData() {
         try {
             const response = await fetch(FIREBASE_URL);
@@ -171,10 +178,11 @@
                 render(data.total || 0, data.target || 1000);
             }
         } catch (e) {
-            console.error("Lỗi đồng bộ dữ liệu");
+            console.error("Lỗi đồng bộ hệ thống...");
         }
     }
 
+    // Hàm hiển thị dữ liệu lên giao diện
     function render(total, target) {
         const p = (total / target) * 100;
         
@@ -184,19 +192,35 @@
         document.getElementById("targetLabel").innerText = target.toLocaleString();
         document.getElementById("remain").innerText = Math.max(0, target - total).toLocaleString();
 
-        if (p >= 100 && !isCompleted) {
-            isCompleted = true;
-            document.getElementById("status_text").innerText = "COMPLETED";
+        // Xử lý khi đạt mục tiêu
+        if (p >= 100) {
+            document.getElementById("congrats-overlay").style.display = "flex";
+            document.getElementById("status_text").innerText = "MISSION SUCCESS";
             document.getElementById("status_text").style.color = "var(--gold)";
-            setInterval(() => {
-                confetti({ particleCount: 30, spread: 70, origin: { y: 0.7 }, colors: ['#009b4d', '#ffce67'] });
-            }, 2000);
+            
+            if (!isCompleted) {
+                isCompleted = true;
+                // Hiệu ứng pháo hoa
+                const duration = 15 * 1000;
+                const end = Date.now() + duration;
+
+                (function frame() {
+                    confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#009b4d', '#ffce67'] });
+                    confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#009b4d', '#ffce67'] });
+                    if (Date.now() < end) requestAnimationFrame(frame);
+                }());
+            }
+        } else {
+            document.getElementById("congrats-overlay").style.display = "none";
+            isCompleted = false;
         }
     }
 
-    // Cập nhật Countdown và Fetch dữ liệu mỗi 2 giây
+    // Vòng lặp cập nhật mỗi 2 giây
     setInterval(() => {
         fetchData();
+        
+        // Cập nhật đồng hồ đếm ngược
         const now = new Date().getTime();
         const distance = deadline - now;
         if (distance > 0) {
@@ -208,7 +232,8 @@
         }
     }, 2000);
 
-    fetchData(); // Chạy lần đầu
+    // Chạy ngay lập tức khi mở trang
+    fetchData();
 </script>
 </body>
 </html>
