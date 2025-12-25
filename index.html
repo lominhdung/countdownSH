@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Surgery Monitor - MSG Elite</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>MSG Surgery Monitor - Final Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Plus+Jakarta+Sans:wght@400;600;800&family=Montserrat:wght@900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -21,86 +21,107 @@
             height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden;
         }
 
-        /* Scanline effect */
+        /* Hiệu ứng quét dòng kỹ thuật số */
         body::before {
-            content: " "; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            content: " "; position: absolute; inset: 0;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
             z-index: 10; background-size: 100% 2px, 3px 100%; pointer-events: none;
         }
 
         .wrapper {
             width: 100vw; height: 177.78vw; max-height: 100vh; max-width: 56.25vh;
             padding: 30px; box-sizing: border-box; display: flex; flex-direction: column;
-            border: 1px solid rgba(255,255,255,0.05);
+            position: relative; z-index: 5;
         }
 
-        /* Nâng cấp Header: Làm sáng Logo */
+        /* Header & Logo Box */
         .header { 
-            background: rgba(255, 255, 255, 0.05); 
-            border-left: 4px solid var(--brand-green); 
-            padding: 15px; border-radius: 0 15px 15px 0; margin-bottom: 30px; 
+            background: rgba(255, 255, 255, 0.03); 
+            border-left: 5px solid var(--brand-green); 
+            padding: 20px; border-radius: 0 20px 20px 0; margin-bottom: 30px; 
         }
-        .logo-container {
-            background: white; padding: 10px; border-radius: 12px;
-            display: inline-block; margin-bottom: 12px; box-shadow: 0 0 20px rgba(0, 155, 77, 0.3);
+        .logo-box {
+            background: white; padding: 12px; border-radius: 15px;
+            display: inline-block; margin-bottom: 15px; box-shadow: 0 0 25px rgba(0, 155, 77, 0.4);
         }
-        .logo { height: 50px; display: block; }
+        .logo { height: 55px; display: block; }
         
-        .status-dot { 
-            width: 8px; height: 8px; background: var(--brand-light); border-radius: 50%; 
-            display: inline-block; margin-right: 8px; box-shadow: 0 0 10px var(--brand-light); 
-            animation: blink 1s infinite; 
-        }
-        @keyframes blink { 50% { opacity: 0.3; } }
+        .status-bar { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; color: var(--brand-light); }
+        .dot { width: 8px; height: 8px; background: var(--brand-light); border-radius: 50%; display: inline-block; margin-right: 8px; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.2; } }
 
-        .main-display {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 20px; padding: 30px 20px; text-align: center;
+        /* Main Display */
+        .main-card {
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 30px; padding: 40px 20px; text-align: center; position: relative;
         }
-
-        .data-label { font-family: var(--font-mono); font-size: 10px; color: var(--brand-light); letter-spacing: 2px; margin-bottom: 20px; }
+        .label { font-family: var(--font-mono); font-size: 11px; color: var(--brand-light); letter-spacing: 3px; margin-bottom: 25px; }
+        
         .big-number { 
-            font-size: 100px; font-weight: 800; color: white; line-height: 0.8;
-            font-family: var(--font-mono); letter-spacing: -5px;
+            font-size: 105px; font-weight: 800; color: white; line-height: 0.8;
+            font-family: var(--font-mono); letter-spacing: -5px; transition: all 0.5s;
         }
+        .glow-active { text-shadow: 0 0 30px var(--brand-light); color: var(--brand-light); }
 
-        .gauge-container { margin: 40px 0; position: relative; }
-        .progress-track { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--brand-green); width: 0%; transition: width 1.5s ease-out; box-shadow: 0 0 15px var(--brand-green); }
-        .ticks { display: flex; justify-content: space-between; margin-top: 10px; font-family: var(--font-mono); font-size: 9px; opacity: 0.4; }
+        /* Gauge */
+        .gauge { margin: 45px 0; }
+        .progress-track { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--brand-green), var(--brand-light)); width: 0%; transition: width 2s cubic-bezier(0.1, 0.5, 0.3, 1); box-shadow: 0 0 20px var(--brand-green); }
+        .ticks { display: flex; justify-content: space-between; margin-top: 12px; font-family: var(--font-mono); font-size: 10px; opacity: 0.4; }
 
-        .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; }
-        .tech-box { border: 1px solid rgba(255,255,255,0.05); padding: 15px; background: rgba(255,255,255,0.01); }
-        .tech-box .val { font-family: var(--font-mono); font-size: 20px; color: var(--gold); display: block; }
-        .tech-box .unit { font-size: 9px; text-transform: uppercase; opacity: 0.4; }
+        .percent-val { font-size: 55px; font-weight: 800; font-family: var(--font-mono); color: white; margin-top: 15px; }
 
-        .time-display {
-            font-family: var(--font-mono); background: #000; padding: 20px;
-            margin-top: 20px; border-radius: 10px; display: flex;
-            justify-content: space-between; align-items: center;
+        /* Grid Stats */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: auto; }
+        .box { border: 1px solid rgba(255,255,255,0.08); padding: 18px; background: rgba(255,255,255,0.02); border-radius: 15px; }
+        .box-val { font-family: var(--font-mono); font-size: 22px; color: var(--gold); display: block; margin-top: 5px; }
+        .box-lbl { font-size: 9px; text-transform: uppercase; opacity: 0.5; font-weight: 700; letter-spacing: 1px; }
+
+        /* Victory Overlay */
+        #victory-screen {
+            position: fixed; inset: 0; z-index: 999; display: none;
+            background: radial-gradient(circle, rgba(0,77,41,0.98) 0%, rgba(1,8,14,1) 100%);
+            flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            animation: fadeIn 0.5s ease;
         }
-        .time-val { font-size: 24px; color: white; }
+        .cup { width: 140px; filter: drop-shadow(0 0 30px var(--gold)); animation: bounce 2s infinite; }
+        .v-text { font-family: 'Montserrat', sans-serif; font-size: 45px; color: var(--gold); margin: 20px 0; text-transform: uppercase; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Footer Time */
+        .footer-time {
+            background: #000; padding: 22px; margin-top: 20px; border-radius: 15px;
+            display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .clock-val { font-family: var(--font-mono); font-size: 26px; color: white; }
     </style>
 </head>
 <body>
 
+<div id="victory-screen">
+    <img src="https://i.imgur.com/vH9vYm8.png" class="cup" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3112/3112946.png'">
+    <div class="v-text">Mục tiêu<br>đã hoàn thành</div>
+    <div style="letter-spacing: 3px; font-weight: 600; color: white; opacity: 0.8;">CHÚC MỪNG ĐỘI NGŨ MẮT SÀI GÒN</div>
+    <button onclick="this.parentElement.style.display='none'" style="margin-top: 40px; background: none; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 10px 20px; cursor: pointer; border-radius: 8px;">Đóng tạm thời</button>
+</div>
+
 <div class="wrapper">
     <div class="header">
-        <div class="logo-container">
-            <img src="logo.png" class="logo">
+        <div class="logo-box">
+            <img src="logo.png" class="logo" alt="Logo">
         </div>
-        <div style="font-size: 10px; opacity: 0.8; letter-spacing: 1px;">
-            <span class="status-dot"></span>LIVE MONITORING / 2025_SURGERY_TRACKER
+        <div class="status-bar">
+            <span class="dot"></span>LIVE MONITORING / SYSTEM ACTIVE
         </div>
     </div>
 
-    <div class="main-display">
-        <div class="data-label">TOTAL SURGICAL PROCEDURES</div>
+    <div class="main-card">
+        <div class="label">TOTAL SURGICAL PROCEDURES</div>
         <div class="big-number" id="totalCount">0000</div>
-        <div style="font-size: 14px; margin-top: 10px; opacity: 0.5;">PROCEDURES COMPLETED</div>
-
-        <div class="gauge-container">
+        
+        <div class="gauge">
             <div class="progress-track">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
@@ -109,79 +130,107 @@
             </div>
         </div>
 
-        <div style="font-size: 48px; font-weight: 800; font-family: var(--font-mono);" id="percentText">0.0%</div>
+        <div class="percent-val" id="percentText">0.0%</div>
     </div>
 
-    <div class="tech-grid">
-        <div class="tech-box">
-            <span class="unit">Chỉ tiêu năm</span>
-            <span class="val" id="targetLabel">0</span>
+    <div class="stats-grid">
+        <div class="box">
+            <span class="box-lbl">Chỉ tiêu năm</span>
+            <span class="box-val" id="targetLabel">0</span>
         </div>
-        <div class="tech-box">
-            <span class="unit">Còn lại</span>
-            <span class="val" id="remainLabel">0</span>
+        <div class="box">
+            <span class="box-lbl">Còn lại</span>
+            <span class="box-val" id="remainLabel">0</span>
         </div>
-        <div class="tech-box">
-            <span class="unit">Trạng thái</span>
-            <span class="val" id="statusLabel" style="font-size: 14px; color: var(--brand-light);">ACTIVE</span>
+        <div class="box">
+            <span class="box-lbl">Trạng thái</span>
+            <span class="box-val" id="statusLabel" style="font-size: 15px; color: var(--brand-light);">ACTIVE</span>
         </div>
-        <div class="tech-box">
-            <span class="unit">Dự báo</span>
-            <span class="val" style="font-size: 14px;">ON TRACK</span>
+        <div class="box">
+            <span class="box-lbl">Dự báo</span>
+            <span class="box-val" style="font-size: 15px;">ON TRACK</span>
         </div>
     </div>
 
-    <div class="time-display">
-        <div style="font-size: 9px; opacity: 0.5; text-transform: uppercase;">Time Remaining<br>to 2026_EOY</div>
-        <div class="time-val" id="countdown">00:00:00:00</div>
+    <div class="footer-time">
+        <div style="font-size: 9px; opacity: 0.4; text-transform: uppercase; font-weight: 700;">Time Remaining<br>to 2026_EOY</div>
+        <div class="clock-val" id="countdown">00:00:00:00</div>
     </div>
 </div>
 
 <script>
-    const DB_URL = "https://cdsh-a2c06-default-rtdb.asia-southeast1.firebasedatabase.app/.json"; // THAY LINK TẠI ĐÂY
-    let isDone = false;
+    // THAY LINK FIREBASE CỦA BẠN VÀO ĐÂY
+    const DB_URL = "https://cdsh-a2c06-default-rtdb.asia-southeast1.firebasedatabase.app\.json";
+    let isCelebrated = false;
 
-    async function sync() {
+    async function fetchData() {
         try {
-            const res = await fetch(DB_URL);
-            const data = await res.json();
+            const response = await fetch(DB_URL);
+            const data = await response.json();
             if(!data) return;
 
             const total = data.total || 0;
-            const target = data.target || 1000;
+            const target = data.target || 5000;
             const p = (total / target) * 100;
 
+            // Cập nhật số liệu chính
             document.getElementById("totalCount").innerText = total.toString().padStart(4, '0');
             document.getElementById("progressFill").style.width = Math.min(p, 100) + "%";
             document.getElementById("percentText").innerText = Math.min(p, 100).toFixed(1) + "%";
+            
+            // Cập nhật Grid
             document.getElementById("targetLabel").innerText = target.toLocaleString();
             document.getElementById("remainLabel").innerText = Math.max(0, target - total).toLocaleString();
 
-            if (p >= 100 && !isDone) {
-                isDone = true;
-                document.getElementById("statusLabel").innerText = "COMPLETED";
+            // Hiệu ứng khi đạt Target
+            if (p >= 100) {
+                document.getElementById("totalCount").classList.add("glow-active");
+                document.getElementById("statusLabel").innerText = "SUCCESS";
                 document.getElementById("statusLabel").style.color = "var(--gold)";
-                setInterval(() => {
-                    confetti({ particleCount: 40, spread: 70, origin: { y: 0.7 }, colors: ['#009b4d', '#ffce67'] });
-                }, 2000);
+                
+                if (!isCelebrated) {
+                    isCelebrated = true;
+                    document.getElementById("victory-screen").style.display = "flex";
+                    
+                    // Hiệu ứng pháo hoa kéo dài
+                    const duration = 15 * 1000;
+                    const animationEnd = Date.now() + duration;
+                    const colors = ['#009b4d', '#ffce67', '#ffffff'];
+
+                    (function frame() {
+                        confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
+                        confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
+                        if (Date.now() < animationEnd) requestAnimationFrame(frame);
+                    }());
+                }
+            } else {
+                isCelebrated = false;
+                document.getElementById("totalCount").classList.remove("glow-active");
+                document.getElementById("statusLabel").innerText = "ACTIVE";
+                document.getElementById("statusLabel").style.color = "var(--brand-light)";
             }
-        } catch(e) {}
+        } catch (error) {
+            console.error("Lỗi đồng bộ:", error);
+        }
     }
 
-    function countdown() {
-        const diff = new Date("2025-12-31T23:59:59") - new Date();
-        if (diff > 0) {
-            const d = Math.floor(diff / 86400000).toString().padStart(2, '0');
-            const h = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
-            const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-            const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+    function updateCountdown() {
+        const endOfYear = new Date("2025-12-31T23:59:59").getTime();
+        const now = new Date().getTime();
+        const gap = endOfYear - now;
+
+        if (gap > 0) {
+            const d = Math.floor(gap / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+            const h = Math.floor((gap % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+            const m = Math.floor((gap % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+            const s = Math.floor((gap % (1000 * 60)) / 1000).toString().padStart(2, '0');
             document.getElementById("countdown").innerText = `${d}:${h}:${m}:${s}`;
         }
     }
 
-    setInterval(sync, 2000);
-    setInterval(countdown, 1000);
-    sync();
+    setInterval(fetchData, 2000); // Đồng bộ mỗi 2 giây
+    setInterval(updateCountdown, 1000); // Chạy đồng hồ mỗi giây
+    fetchData(); // Chạy lần đầu ngay lập tức
 </script>
 </body>
 </html>
