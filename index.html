@@ -3,173 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surgery Monitor - Light & Modern</title>
+    <title>Surgery Monitor - Premium Light</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --primary: #007bff; /* Blue */
-            --success: #28a745; /* Green */
-            --accent: #ff9f1c; /* Orange */
+            --primary: #007bff;
+            --success: #28a745;
+            --accent: #ff9f1c;
             --bg-light: #f4f7f9;
-            --glass-white: rgba(255, 255, 255, 0.8);
         }
 
         body {
-            margin: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0; font-family: 'Plus Jakarta Sans', sans-serif;
             background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-            color: #2d3436;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        /* Hiệu ứng các khối màu mờ ảo phía sau làm sáng màn hình */
-        body::before {
-            content: ""; position: absolute; width: 400px; height: 400px;
-            background: radial-gradient(circle, rgba(0, 123, 255, 0.2) 0%, transparent 70%);
-            top: -10%; right: -10%; z-index: -1;
+            color: #2d3436; height: 100vh;
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
         }
 
         .wrapper {
-            width: 100vw; height: 177.78vw; 
-            max-height: 100vh; max-width: 56.25vh;
-            padding: 25px; box-sizing: border-box;
-            display: flex; flex-direction: column; position: relative;
+            width: 100vw; height: 177.78vw; max-height: 100vh; max-width: 56.25vh;
+            padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; position: relative;
         }
 
-        /* Header sang trọng */
-        .header { 
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; padding: 10px;
-            background: var(--glass-white); border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
+        /* Thành phần giao diện */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: rgba(255,255,255,0.8); padding: 10px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .logo { height: 50px; }
-        .live-tag {
-            font-size: 9px; font-weight: 800; color: var(--success);
-            border: 1px solid var(--success); padding: 4px 8px; border-radius: 20px;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-        /* Card chính rực rỡ */
-        .main-card {
-            background: var(--glass-white);
-            border: 2px solid #ffffff;
-            border-radius: 35px;
-            padding: 40px 20px;
-            text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.08);
-            backdrop-filter: blur(10px);
-            margin-bottom: 20px;
-        }
-
-        .data-label { font-size: 12px; font-weight: 700; color: #636e72; letter-spacing: 2px; text-transform: uppercase; }
-        
-        .big-number { 
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 110px; font-weight: 800; 
-            color: #000;
-            line-height: 1; margin: 15px 0;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.05);
-        }
-
-        /* Thanh tiến trình màu Gradient sáng */
-        .progress-track { 
-            height: 16px; background: #dfe6e9; 
-            border-radius: 20px; overflow: hidden; margin: 30px 0;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .progress-fill { 
-            height: 100%; width: 0%;
-            background: linear-gradient(90deg, #00c6ff, #0072ff);
-            border-radius: 20px; transition: width 2s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-        }
-        .progress-fill::after {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            animation: move-light 2s infinite;
-        }
-        @keyframes move-light { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-
-        /* Grid thông số */
+        .main-card { background: rgba(255,255,255,0.9); border: 2px solid #fff; border-radius: 35px; padding: 40px 20px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.08); backdrop-filter: blur(10px); margin-bottom: 20px; }
+        .big-number { font-family: 'JetBrains Mono', monospace; font-size: 110px; font-weight: 800; color: #000; line-height: 1; margin: 15px 0; }
+        .progress-track { height: 16px; background: #dfe6e9; border-radius: 20px; overflow: hidden; margin: 30px 0; }
+        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #00c6ff, #0072ff); border-radius: 20px; transition: width 2s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .stat-box { 
-            background: var(--glass-white); padding: 20px; 
-            border-radius: 25px; border: 2px solid #fff;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.03);
-        }
+        .stat-box { background: #fff; padding: 20px; border-radius: 25px; border: 2px solid #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.03); text-align: center; }
         .stat-box .val { font-family: 'JetBrains Mono'; font-size: 26px; color: var(--primary); display: block; }
-        .stat-box .lbl { font-size: 10px; color: #636e72; font-weight: 700; text-transform: uppercase; }
+        .footer { margin-top: auto; padding: 20px; background: #2d3436; border-radius: 25px; display: flex; justify-content: space-between; align-items: center; color: #fff; }
 
-        /* Footer */
-        .footer {
-            margin-top: auto; padding: 20px;
-            background: #2d3436; border-radius: 25px;
-            display: flex; justify-content: space-between; align-items: center;
-            color: #fff;
-        }
-        .countdown-val { font-family: 'JetBrains Mono'; font-size: 26px; font-weight: 700; color: var(--accent); }
-
-        /* Overlay Chúc Mừng */
+        /* MÀN HÌNH CHÚC MỪNG PHỦ KÍN */
         #victory-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.95);
+            background: #ffffff; /* Màu nền trắng đặc để che hết số liệu */
             display: none; flex-direction: column; justify-content: center;
-            align-items: center; z-index: 100; text-align: center;
-            animation: zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            align-items: center; z-index: 9999; /* Đảm bảo nổi lên trên cùng */
+            text-align: center;
         }
-        @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        #victory-screen h1 { font-size: 45px; color: #000; margin: 20px 0; font-weight: 800; }
+        #victory-screen p { font-size: 20px; color: var(--primary); font-weight: 600; padding: 0 20px; }
+        .badge { font-size: 120px; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
     </style>
 </head>
 <body>
 
 <div id="victory-screen">
-    <div style="font-size: 100px;">🎊</div>
-    <h1 style="font-size: 40px; color: #000;">MỤC TIÊU HOÀN THÀNH!</h1>
-    <p style="font-size: 18px; color: var(--primary); font-weight: 600;">Hệ thống ghi nhận sự nỗ lực tuyệt vời<br>từ đội ngũ y bác sĩ Mắt Sài Gòn</p>
+    <div class="badge">🏆</div>
+    <h1>MISSION COMPLETED</h1>
+    <p>Mắt Sài Gòn chúc mừng đội ngũ y bác sĩ<br>đã xuất sắc hoàn thành mục tiêu năm!</p>
+    <div style="margin-top: 50px; font-size: 12px; color: #b2bec3; font-family: 'JetBrains Mono';">REAL-TIME SURGERY TRACKER v2.0</div>
 </div>
 
 <div class="wrapper">
     <div class="header">
         <img src="logo.png" class="logo">
-        <div class="live-tag">● REAL-TIME UPDATE</div>
+        <div style="font-size: 10px; font-weight: 800; color: var(--success);">● LIVE UPDATE</div>
     </div>
 
     <div class="main-card">
-        <div class="data-label">Tổng Ca Phẫu Thuật</div>
+        <div style="font-size: 12px; font-weight: 700; color: #636e72; letter-spacing: 2px;">TỔNG CA PHẪU THUẬT</div>
         <div class="big-number" id="totalCount">0000</div>
-        
-        <div class="progress-track">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
         <div style="font-size: 55px; font-weight: 800; font-family: 'JetBrains Mono'; color: var(--primary);" id="percent">0.0%</div>
     </div>
 
     <div class="stats-grid">
-        <div class="stat-box">
-            <span class="lbl">Mục Tiêu</span>
-            <span class="val" id="targetLabel">0</span>
-        </div>
-        <div class="stat-box">
-            <span class="lbl">Còn Lại</span>
-            <span class="val" id="remain" style="color: var(--accent);">0</span>
-        </div>
+        <div class="stat-box"><span style="font-size: 10px; font-weight: 700; color: #636e72;">MỤC TIÊU</span><span class="val" id="targetLabel">0</span></div>
+        <div class="stat-box"><span style="font-size: 10px; font-weight: 700; color: #636e72;">CÒN LẠI</span><span class="val" id="remain" style="color: var(--accent);">0</span></div>
     </div>
 
     <div class="footer">
-        <div style="font-size: 10px; font-weight: 700;">THỜI GIAN<br>KẾT THÚC</div>
-        <div class="countdown-val" id="countdown">00:00:00:00</div>
+        <div style="font-size: 10px; font-weight: 700;">THỜI GIAN<br>CÒN LẠI</div>
+        <div style="font-family: 'JetBrains Mono'; font-size: 26px; font-weight: 700; color: var(--accent);" id="countdown">00:00:00:00</div>
     </div>
 </div>
 
 <script>
+    // --- THAY LINK FIREBASE CỦA BẠN VÀO ĐÂY ---
     const DB_URL = "https://cdsh-a2c06-default-rtdb.asia-southeast1.firebasedatabase.app/.json";
     
     let isDone = false;
@@ -191,12 +108,19 @@
                 if(p >= 100 && !isDone) {
                     isDone = true;
                     document.getElementById("victory-screen").style.display = "flex";
-                    let end = Date.now() + (10 * 1000);
-                    (function frame() {
-                        confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 } });
-                        confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 } });
-                        if (Date.now() < end) requestAnimationFrame(frame);
-                    }());
+                    
+                    // Hiệu ứng pháo hoa kéo dài
+                    var duration = 15 * 1000;
+                    var animationEnd = Date.now() + duration;
+                    var interval = setInterval(function() {
+                        var timeLeft = animationEnd - Date.now();
+                        if (timeLeft <= 0) return clearInterval(interval);
+                        confetti({ particleCount: 40, spread: 70, origin: { y: 0.6 } });
+                    }, 250);
+                } else if (p < 100) {
+                    // Nếu số liệu giảm xuống dưới 100% thì ẩn màn hình chúc mừng đi
+                    document.getElementById("victory-screen").style.display = "none";
+                    isDone = false;
                 }
             }
         } catch(e) {}
